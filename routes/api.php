@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DocterController;
+use App\Http\Controllers\employeeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,9 +33,16 @@ Route::group(['middleware' => 'api'],function ()  {
     Route::post('Delete_User/{id}' , [UserController::class,'destroy'] )->middleware('auth');
    });
 
+################################      DOCTOR         ##########################################################
+
    Route::post('Add_Doctor' , [DocterController::class,'create'] )->middleware('auth');
    Route::get('All_doctors' , [DocterController::class,'index'] )->middleware('auth');
    Route::get('Show_doctor/{id}' , [DocterController::class,'show'] )->middleware('auth');
    Route::post('Edit_Doctor/{id}' , [DocterController::class,'edit'] )->middleware('auth');
    Route::post('Delete_Doctor/{id}' , [DocterController::class,'destroy'] )->middleware('auth');
-   
+################################      EMPLOYEE         ##########################################################
+Route::post('Add_Employee' , [employeeController::class,'create'] )->middleware('auth');
+Route::get('All_Employee' , [employeeController::class,'index'] )->middleware('auth');
+Route::get('Show_Employee/{id}' , [employeeController::class,'show'] )->middleware('auth');
+Route::post('Edit_Employee/{id}' , [employeeController::class,'edit'] )->middleware('auth');
+Route::post('Delete_Employee/{id}' , [employeeController::class,'destroy'] )->middleware('auth');
