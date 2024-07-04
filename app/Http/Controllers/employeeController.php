@@ -39,7 +39,7 @@ class employeeController extends Controller
                 'total_salary' => 'required|numeric|min:0', // Total salary is required, must be numeric, and at least 0
                 'fixed_salary' => 'required|numeric|min:0', // Fixed salary is required, must be numeric, and at least 0
                 'overtime_salary' => 'numeric|min:0', // Overtime salary must be numeric, and at least 0
-                'specialty' => 'required', // Overtime salary must be numeric, and at least 0
+               
             ]);
 
         
@@ -50,7 +50,6 @@ class employeeController extends Controller
             $employee->description = $request->description;
             $employee->total_salary = $request->total_salary;
             $employee->overtime_salary = $request->overtime_salary;
-            $employee->specialty = $request->specialty;
             $employee->fixed_salary = $request->fixed_salary;
             $res = $employee->save();
             if ($res) {
@@ -95,7 +94,6 @@ class employeeController extends Controller
                 'description' => 'string|max:1000', // Description must be a string and max length of 1000 characters
                 'national_id' => 'required|numeric', // National ID is required, must be numeric and exactly 10 digits
                 'phone_number' => 'required|string|regex:/^\+?[0-9]{7,15}$/', // Phone number is required, should be a string, and match the regex pattern
-                'specialty' => 'required', // Phone number is required, should be a string, and match the regex pattern
                 'total_salary' => 'required|numeric|min:0', // Total salary is required, must be numeric, and at least 0
                 'fixed_salary' => 'required|numeric|min:0', // Fixed salary is required, must be numeric, and at least 0
                 'overtime_salary' => 'numeric|min:0', // Overtime salary must be numeric, and at least 0
@@ -110,7 +108,7 @@ class employeeController extends Controller
             $employee->total_salary = $request->total_salary;
             $employee->overtime_salary = $request->overtime_salary;
             $employee->fixed_salary = $request->fixed_salary;
-            $employee->specialty = $request->specialty;
+         
             $res = $employee->save();
             if ($res) {
                 return response()->json(['message' => 'employee updated successfully', 'employee' => $employee]);

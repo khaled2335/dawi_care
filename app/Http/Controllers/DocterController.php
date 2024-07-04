@@ -37,10 +37,12 @@ class DocterController extends Controller
                      'phone_number' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:doctors,phone_number',
                      'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
                      'union_registration' => 'required||max:255',
+                     'specialty' => 'required|',
                      'scientific_degree' => 'required|max:255',
                      'total_salary' => 'required|numeric|min:0',
                      'worked_days' => 'required|integer|min:0',
                      'fixed_salary' => 'required|numeric|min:0',
+                  
                 ]
             );
 
@@ -60,6 +62,7 @@ class DocterController extends Controller
             $doctor->union_registration = asset('photos/union_registration_file/' . $union_registration_file); 
             $doctor->total_salary = $request->total_salary;
             $doctor->worked_days = $request->worked_days;
+            $doctor->specialty = $request->specialty;
             $doctor->fixed_salary = $request->fixed_salary;
             $res = $doctor->save();
             if ($res) {
@@ -108,6 +111,7 @@ class DocterController extends Controller
                      'scientific_degree' => 'required|max:255',
                      'total_salary' => 'required|numeric|min:0',
                      'worked_days' => 'required|integer|min:0',
+                     'specialty' => 'required',
                      'fixed_salary' => 'required|numeric|min:0',
                 ]
             );
@@ -153,6 +157,7 @@ class DocterController extends Controller
             $doctor->total_salary = $request->total_salary;
             $doctor->worked_days = $request->worked_days;
             $doctor->fixed_salary = $request->fixed_salary;
+            $doctor->specialty = $request->specialty;
     
             $res = $doctor->save();
             if ($res) {
