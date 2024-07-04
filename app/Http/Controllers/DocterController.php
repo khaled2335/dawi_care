@@ -48,16 +48,16 @@ class DocterController extends Controller
             $doctor_image_name = rand() . '.' .$request->profile_photo->getClientOriginalExtension(); 
             $request->profile_photo->move(public_path('/photos/doctor_photo'),$doctor_image_name);
 
-            $scientific_degree_file = rand() . '.' .$request->scientific_degree->getClientOriginalExtension(); 
-            $request->scientific_degree->move(public_path('/photos/scientific_degree_file'),$scientific_degree_file);
+            $union_registration_file = rand() . '.' .$request->union_registration->getClientOriginalExtension(); 
+            $request->union_registration->move(public_path('/photos/scientific_degree_file'),$union_registration_file);
 
             $doctor = new Doctor;
             $doctor->name = $request->name;
             $doctor->national_id = $request->national_id;
             $doctor->phone_number = $request->phone_number;
             $doctor->profile_photo = asset('photos/doctor_photo/' . $doctor_image_name); 
-            $doctor->union_registration = $request->union_registration;
-            $doctor->scientific_degree = asset('photos/scientific_degree_file/' . $scientific_degree_file); 
+            $doctor->scientific_degree = $request->scientific_degree;
+            $doctor->union_registration = asset('photos/union_registration_file/' . $union_registration_file); 
             $doctor->total_salary = $request->total_salary	;
             $doctor->worked_days = $request->worked_days;
             $doctor->fixed_salary = $request->fixed_salary;
@@ -122,16 +122,16 @@ class DocterController extends Controller
             }
     
             // Handle scientific degree file upload
-            if ($request->hasFile('scientific_degree')) {
-                $scientific_degree_file = rand() . '.' . $request->scientific_degree->getClientOriginalExtension();
-                $request->scientific_degree->move(public_path('/photos/scientific_degree_file'), $scientific_degree_file);
-                $doctor->scientific_degree = asset('photos/scientific_degree_file/' . $scientific_degree_file);
+            if ($request->hasFile('union_registration')) {
+                $union_registration_file = rand() . '.' . $request->union_registration->getClientOriginalExtension();
+                $request->union_registration->move(public_path('/photos/union_registration_file'), $union_registration_file);
+                $doctor->union_registration = asset('photos/union_registration_file/' . $union_registration_file);
             }
     
             $doctor->name = $request->name;
             $doctor->national_id = $request->national_id;
             $doctor->phone_number = $request->phone_number;
-            $doctor->union_registration = $request->union_registration;
+            $doctor->scientific_degree = $request->scientific_degree;
             $doctor->total_salary = $request->total_salary;
             $doctor->worked_days = $request->worked_days;
             $doctor->fixed_salary = $request->fixed_salary;
@@ -178,7 +178,7 @@ class DocterController extends Controller
                         unlink($oldPhotoPath);
                     }
                 }
-                $scientific_degree_path = public_path('/photos/scientific_degree_file/' . basename($doctor->scientific_degree));
+                $union_registration_path = public_path('/photos/union_registration_file/' . basename($doctor->union_registration));
                 
         
     
@@ -188,25 +188,25 @@ class DocterController extends Controller
             }
     
             // Handle scientific degree file upload
-            if ($request->hasFile('scientific_degree')) {
+            if ($request->hasFile('union_registration')) {
                 // Delete old scientific degree file
-                if ($doctor->scientific_degree) {
+                if ($doctor->union_registration) {
                     // $oldDegreePath = public_path(parse_url($doctor->scientific_degree, PHP_URL_PATH));
-                    $oldDegreePath =  public_path('/photos/scientific_degree_file/' . basename($doctor->scientific_degree));;
+                    $oldDegreePath =  public_path('/photos/union_registration_file/' . basename($doctor->union_registration));;
                     if (file_exists($oldDegreePath)) {
                         unlink($oldDegreePath);
                     }
                 }
     
-                $scientific_degree_file = rand() . '.' . $request->scientific_degree->getClientOriginalExtension();
-                $request->scientific_degree->move(public_path('/photos/scientific_degree_file'), $scientific_degree_file);
-                $doctor->scientific_degree = asset('photos/scientific_degree_file/' . $scientific_degree_file);
+                $union_registration_file = rand() . '.' . $request->union_registration->getClientOriginalExtension();
+                $request->union_registration->move(public_path('/photos/union_registration_file'), $union_registration_file);
+                $doctor->union_registration = asset('photos/union_registration_file/' . $union_registration_file);
             }
     
             $doctor->name = $request->name;
             $doctor->national_id = $request->national_id;
             $doctor->phone_number = $request->phone_number;
-            $doctor->union_registration = $request->union_registration;
+            $doctor->scientific_degree = $request->scientific_degree;
             $doctor->total_salary = $request->total_salary;
             $doctor->worked_days = $request->worked_days;
             $doctor->fixed_salary = $request->fixed_salary;
@@ -239,7 +239,7 @@ class DocterController extends Controller
 
     // Define paths to the files
     $profile_photo_path = public_path('/photos/doctor_photo/' . basename($doctor->profile_photo));
-    $scientific_degree_path = public_path('/photos/scientific_degree_file/' . basename($doctor->scientific_degree));
+    $union_registration_path = public_path('/photos/union_registration_file/' . basename($doctor->union_registration));
 
     // Delete the profile photo if it exists
     if (file_exists($profile_photo_path)) {
@@ -247,8 +247,8 @@ class DocterController extends Controller
     }
 
     // Delete the scientific degree file if it exists
-    if (file_exists($scientific_degree_path)) {
-        unlink($scientific_degree_path);
+    if (file_exists($union_registration_path)) {
+        unlink($union_registration_path);
     }
 
     // Delete the doctor record
