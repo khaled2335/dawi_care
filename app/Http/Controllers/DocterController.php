@@ -39,7 +39,6 @@ class DocterController extends Controller
                      'union_registration' => 'required||max:255',
                      'specialty' => 'required|',
                      'scientific_degree' => 'required|max:255',
-                     'total_salary' => 'required|numeric|min:0',
                      'worked_days' => 'required|integer|min:0',
                      'fixed_salary' => 'required|numeric|min:0',
                   
@@ -60,7 +59,6 @@ class DocterController extends Controller
             $doctor->profile_photo = asset('photos/doctor_photo/' . $doctor_image_name); 
             $doctor->scientific_degree = $request->scientific_degree;
             $doctor->union_registration = asset('photos/union_registration_file/' . $union_registration_file); 
-            $doctor->total_salary = $request->total_salary;
             $doctor->worked_days = $request->worked_days;
             $doctor->specialty = $request->specialty;
             $doctor->fixed_salary = $request->fixed_salary;
@@ -109,7 +107,6 @@ class DocterController extends Controller
                      'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
                      'union_registration' => 'required||max:255|',
                      'scientific_degree' => 'required|max:255',
-                     'total_salary' => 'required|numeric|min:0',
                      'worked_days' => 'required|integer|min:0',
                      'specialty' => 'required',
                      'fixed_salary' => 'required|numeric|min:0',
@@ -154,7 +151,6 @@ class DocterController extends Controller
             $doctor->national_id = $request->national_id;
             $doctor->phone_number = $request->phone_number;
             $doctor->scientific_degree = $request->scientific_degree;
-            $doctor->total_salary = $request->total_salary;
             $doctor->worked_days = $request->worked_days;
             $doctor->fixed_salary = $request->fixed_salary;
             $doctor->specialty = $request->specialty;
