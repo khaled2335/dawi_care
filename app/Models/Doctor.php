@@ -16,8 +16,13 @@ class Doctor extends Model
         'profile_photo',
         'union_registration',
         'scientific_degree',
-        'total_salary',
         'worked_days' ,
         'fixed_salary',
     ];
+     // Define the worked_days attribute as a cast to an array if stored as JSON
+     protected $casts = [
+        'worked_days' => 'string',
+    ];
+
 }
+

@@ -30,20 +30,20 @@ class DocterController extends Controller
         $admin = Auth::user();
         if ($admin && $admin->role == 'admin') { 
            
-            $request->validate(
-                [
-                    'name' => 'required|string|max:255',
-                     'national_id' => 'required|digits_between:10,20|unique:doctors,national_id',
-                     'phone_number' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:doctors,phone_number',
-                     'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-                     'union_registration' => 'required||max:255',
-                     'specialty' => 'required|',
-                     'scientific_degree' => 'required|max:255',
-                     'worked_days' => 'required|integer|min:0',
-                     'fixed_salary' => 'required|numeric|min:0',
+            // $request->validate(
+            //     [
+            //         'name' => 'required|string|max:255',
+            //          'national_id' => 'required|digits_between:10,20|unique:doctors,national_id',
+            //          'phone_number' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:doctors,phone_number',
+            //          'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            //          'union_registration' => 'required||max:255',
+            //          'specialty' => 'required',
+            //          'scientific_degree' => 'required|max:255',
+            //          'worked_days' => 'required|integer|min:0',
+            //          'fixed_salary' => 'required|numeric|min:0',
                   
-                ]
-            );
+            //     ]
+            // );
 
             // Handle profile photo upload
             $doctor_image_name = rand() . '.' .$request->profile_photo->getClientOriginalExtension(); 
@@ -64,12 +64,30 @@ class DocterController extends Controller
             $doctor->fixed_salary = $request->fixed_salary;
             $res = $doctor->save();
             if ($res) {
-                return response()->json(['message' => 'Doctor added successfully', 'doctor' => $doctor]);
-            } else {
-                return response()->json(['message' => 'Registration failed']);
+               
+                $doctors = Doctor::all();
+
+            // Loop through each doctor and update the number of working days
+              foreach ($doctors as $doctor) {
+                if (isset($doctor->worked_days)) {
+                    // Convert comma-separated string to an array
+                    $workedDaysArray = array_map('trim', explode(',', $doctor->worked_days));
+                    // Filter out empty values and count the number of working days
+                    $doctor->num_working_days = count(array_filter($workedDaysArray));
+                } else {
+                    $doctor->num_working_days = 0;
+                }
+
+                // Save the updated doctor record
+                $doctor->save();
             }
-        }
-        return response()->json(['message' => 'Unauthorized'], 403);
+
+                } else {
+                    return response()->json(['message' => 'Registration failed']);
+                }
+            return response()->json(['message' => 'Doctor added successfully', 'doctor' => $doctor]);
+            }
+            return response()->json(['message' => 'Unauthorized'], 403);
     }
 
     /**
@@ -99,19 +117,19 @@ class DocterController extends Controller
                 return response()->json(['message' => 'Doctor not found'], 404);
             }
     
-            $request->validate(
-                [
-                    'name' => 'required|string|max:255',
-                     'national_id' => 'required|digits_between:10,20|unique:doctors,national_id',
-                     'phone_number' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:doctors,phone_number',
-                     'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-                     'union_registration' => 'required||max:255|',
-                     'scientific_degree' => 'required|max:255',
-                     'worked_days' => 'required|integer|min:0',
-                     'specialty' => 'required',
-                     'fixed_salary' => 'required|numeric|min:0',
-                ]
-            );
+            // $request->validate(
+            //     [
+            //         'name' => 'required|string|max:255',
+            //          'national_id' => 'required|digits_between:10,20|unique:doctors,national_id',
+            //          'phone_number' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:doctors,phone_number',
+            //          'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            //          'union_registration' => 'required||max:255|',
+            //          'scientific_degree' => 'required|max:255',
+            //          'worked_days' => 'required|integer|min:0',
+            //          'specialty' => 'required',
+            //          'fixed_salary' => 'required|numeric|min:0',
+            //     ]
+            // );
             // Handle profile photo upload
             if ($request->hasFile('profile_photo')) {
                 // Delete old profile photo
@@ -158,11 +176,29 @@ class DocterController extends Controller
             $res = $doctor->save();
             if ($res) {
                 return response()->json(['message' => 'Doctor updated successfully', 'doctor' => $doctor]);
-            } else {
-                return response()->json(['message' => 'Update failed']);
+                $doctors = Doctor::all();
+
+            // Loop through each doctor and update the number of working days
+            foreach ($doctors as $doctor) {
+                if (isset($doctor->worked_days)) {
+                    // Convert comma-separated string to an array
+                    $workedDaysArray = array_map('trim', explode(',', $doctor->worked_days));
+                    // Filter out empty values and count the number of working days
+                    $doctor->num_working_days = count(array_filter($workedDaysArray));
+                } else {
+                    $doctor->num_working_days = 0;
+                }
+
+                // Save the updated doctor record
+                $doctor->save();
             }
-        }
-        return response()->json(['message' => 'Unauthorized'], 403);
+
+            return response()->json(['message' => 'Number of working days updated successfully for all doctors']);
+                } else {
+                    return response()->json(['message' => 'Update failed']);
+                }
+            }
+            return response()->json(['message' => 'Unauthorized'], 403);
     }
 
 
@@ -211,6 +247,45 @@ class DocterController extends Controller
      }
     }
 
+    
+   
+
+    // public function updateNumWorkingDaysForAllDoctors()
+    // {
+    //     $doctors = Doctor::all();
+
+    //     // Loop through each doctor and update the number of working days
+    //     foreach ($doctors as $doctor) {
+    //         if (isset($doctor->worked_days)) {
+    //             // Convert comma-separated string to an array
+    //             $workedDaysArray = array_map('trim', explode(',', $doctor->worked_days));
+    //             // Filter out empty values and count the number of working days
+    //             $doctor->num_working_days = count(array_filter($workedDaysArray));
+    //         } else {
+    //             $doctor->num_working_days = 0;
+    //         }
+
+    //         // Save the updated doctor record
+    //         $doctor->save();
+    //     }
+
+    //     return response()->json(['message' => 'Number of working days updated successfully for all doctors']);
+    // }
+
+
+
+
+
+
+
+    }
+
+    /**
+     * Calculate and update the number of working days.
+     *
+     * @param Doctor $doctor
+     */
+   
 
 
 
@@ -221,4 +296,49 @@ class DocterController extends Controller
 
 
 
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
