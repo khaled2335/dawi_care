@@ -108,75 +108,71 @@ class DocterController extends Controller
      * Show the form for editing the specified resource.
      */
    
+    
     public function edit(string $id, Request $request)
-    {
-        $admin = Auth::user();
-        if ($admin && $admin->role == 'admin') {
-            $doctor = Doctor::find($id);
-            if (!$doctor) {
-                return response()->json(['message' => 'Doctor not found'], 404);
-            }
-    
-            // $request->validate(
-            //     [
-            //         'name' => 'required|string|max:255',
-            //          'national_id' => 'required|digits_between:10,20|unique:doctors,national_id',
-            //          'phone_number' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:doctors,phone_number',
-            //          'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            //          'union_registration' => 'required||max:255|',
-            //          'scientific_degree' => 'required|max:255',
-            //          'worked_days' => 'required|integer|min:0',
-            //          'specialty' => 'required',
-            //          'fixed_salary' => 'required|numeric|min:0',
-            //     ]
-            // );
-            // Handle profile photo upload
-            if ($request->hasFile('profile_photo')) {
-                // Delete old profile photo
-                if ($doctor->profile_photo) {
-                    
-                    $oldPhotoPath = public_path('/photos/doctor_photo/' . basename($doctor->profile_photo));
-                    if (file_exists($oldPhotoPath)) {
-                        unlink($oldPhotoPath);
-                    }
+{
+    $admin = Auth::user();
+    if ($admin && $admin->role == 'admin') {
+        $doctor = Doctor::find($id);
+        if (!$doctor) {
+            return response()->json(['message' => 'Doctor not found'], 404);
+        }
+
+        // $request->validate(
+        //     [
+        //         'name' => 'required|string|max:255',
+        //         'national_id' => 'required|digits_between:10,20|unique:doctors,national_id',
+        //         'phone_number' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:doctors,phone_number',
+        //         'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        //         'union_registration' => 'required||max:255|',
+        //         'scientific_degree' => 'required|max:255',
+        //         'worked_days' => 'required|integer|min:0',
+        //         'specialty' => 'required',
+        //         'fixed_salary' => 'required|numeric|min:0',
+        //     ]
+        // );
+
+        // Handle profile photo upload
+        if ($request->hasFile('profile_photo')) {
+            // Delete old profile photo
+            if ($doctor->profile_photo) {
+                $oldPhotoPath = public_path('/photos/doctor_photo/' . basename($doctor->profile_photo));
+                if (file_exists($oldPhotoPath)) {
+                    unlink($oldPhotoPath);
                 }
-                $union_registration_path = public_path('/photos/union_registration_file/' . basename($doctor->union_registration));
-                
-        
-    
-                $doctor_image_name = rand() . '.' . $request->profile_photo->getClientOriginalExtension();
-                $request->profile_photo->move(public_path('/photos/doctor_photo'), $doctor_image_name);
-                $doctor->profile_photo = asset('photos/doctor_photo/' . $doctor_image_name);
             }
-    
-            // Handle scientific degree file upload
-            if ($request->hasFile('union_registration')) {
-                // Delete old scientific degree file
-                if ($doctor->union_registration) {
-                    // $oldDegreePath = public_path(parse_url($doctor->scientific_degree, PHP_URL_PATH));
-                    $oldDegreePath =  public_path('/photos/union_registration_file/' . basename($doctor->union_registration));;
-                    if (file_exists($oldDegreePath)) {
-                        unlink($oldDegreePath);
-                    }
+
+            $doctor_image_name = rand() . '.' . $request->profile_photo->getClientOriginalExtension();
+            $request->profile_photo->move(public_path('/photos/doctor_photo'), $doctor_image_name);
+            $doctor->profile_photo = asset('photos/doctor_photo/' . $doctor_image_name);
+        }
+
+        // Handle union registration file upload
+        if ($request->hasFile('union_registration')) {
+            // Delete old union registration file
+            if ($doctor->union_registration) {
+                $oldUnionRegPath = public_path('/photos/union_registration_file/' . basename($doctor->union_registration));
+                if (file_exists($oldUnionRegPath)) {
+                    unlink($oldUnionRegPath);
                 }
-    
-                $union_registration_file = rand() . '.' . $request->union_registration->getClientOriginalExtension();
-                $request->union_registration->move(public_path('/photos/union_registration_file'), $union_registration_file);
-                $doctor->union_registration = asset('photos/union_registration_file/' . $union_registration_file);
             }
-    
-            $doctor->name = $request->name;
-            $doctor->national_id = $request->national_id;
-            $doctor->phone_number = $request->phone_number;
-            $doctor->scientific_degree = $request->scientific_degree;
-            $doctor->worked_days = $request->worked_days;
-            $doctor->fixed_salary = $request->fixed_salary;
-            $doctor->specialty = $request->specialty;
-    
-            $res = $doctor->save();
-            if ($res) {
-                return response()->json(['message' => 'Doctor updated successfully', 'doctor' => $doctor]);
-                $doctors = Doctor::all();
+
+            $union_registration_file = rand() . '.' . $request->union_registration->getClientOriginalExtension();
+            $request->union_registration->move(public_path('/photos/union_registration_file'), $union_registration_file);
+            $doctor->union_registration = asset('photos/union_registration_file/' . $union_registration_file);
+        }
+
+        $doctor->name = $request->name;
+        $doctor->national_id = $request->national_id;
+        $doctor->phone_number = $request->phone_number;
+        $doctor->scientific_degree = $request->scientific_degree;
+        $doctor->worked_days = $request->worked_days;
+        $doctor->fixed_salary = $request->fixed_salary;
+        $doctor->specialty = $request->specialty;
+
+        $res = $doctor->save();
+        if ($res) {
+            $doctors = Doctor::all();
 
             // Loop through each doctor and update the number of working days
             foreach ($doctors as $doctor) {
@@ -193,13 +189,13 @@ class DocterController extends Controller
                 $doctor->save();
             }
 
-            return response()->json(['message' => 'Number of working days updated successfully for all doctors']);
-                } else {
-                    return response()->json(['message' => 'Update failed']);
-                }
-            }
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => 'Doctor updated successfully', 'doctor' => $doctor]);
+        } else {
+            return response()->json(['message' => 'Update failed']);
+        }
     }
+    return response()->json(['message' => 'Unauthorized'], 403);
+}
 
 
     /**

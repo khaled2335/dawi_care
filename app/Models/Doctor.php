@@ -16,6 +16,7 @@ class Doctor extends Model
         'profile_photo',
         'union_registration',
         'scientific_degree',
+        'total_salary',
         'worked_days' ,
         'fixed_salary',
     ];
