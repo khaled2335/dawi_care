@@ -47,7 +47,6 @@ class employeeController extends Controller
             $employee->national_id = $request->national_id;
             $employee->phone_number = $request->phone_number;
             $employee->description = $request->description;
-            $employee->overtime_salary = $request->overtime_salary;
             $employee->fixed_salary = $request->fixed_salary;
             $res = $employee->save();
             if ($res) {
