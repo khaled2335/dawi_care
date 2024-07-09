@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DocterController;
 use App\Http\Controllers\employeeController;
+use App\Http\Controllers\week_days;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,3 +47,9 @@ Route::get('All_Employee' , [employeeController::class,'index'] )->middleware('a
 Route::get('Show_Employee/{id}' , [employeeController::class,'show'] )->middleware('auth');
 Route::post('Edit_Employee/{id}' , [employeeController::class,'edit'] )->middleware('auth');
 Route::post('Delete_Employee/{id}' , [employeeController::class,'destroy'] )->middleware('auth');
+################################      worked_days         ##########################################################
+Route::post('Add_Week_day/{id}' , [week_days::class,'create'] )->middleware('auth');
+Route::get('All_Week_day' , [week_days::class,'index'] )->middleware('auth');
+Route::get('Show_Week_day/{id}' , [week_days::class,'show'] )->middleware('auth');
+Route::post('Edit_Week_day/{id}' , [week_days::class,'edit'] )->middleware('auth');
+Route::post('Delete_Week_day/{id}' , [week_days::class,'destroy'] )->middleware('auth');
