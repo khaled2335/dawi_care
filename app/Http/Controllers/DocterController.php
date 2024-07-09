@@ -64,11 +64,13 @@ class DocterController extends Controller
             $doctor->fixed_salary = $request->fixed_salary;
             $res = $doctor->save();
             if ($res) {
+
+               
                
                 $doctors = Doctor::all();
 
             // Loop through each doctor and update the number of working days
-              foreach ($doctors as $doctor) {
+              foreach ($doctors as $doctor) {         
                 if (isset($doctor->worked_days)) {
                     // Convert comma-separated string to an array
                     $workedDaysArray = array_map('trim', explode(',', $doctor->worked_days));

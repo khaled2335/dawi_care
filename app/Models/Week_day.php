@@ -8,5 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Week_day extends Model
 {
     public $timestamps = false;
-    use HasFactory;
+    use HasFactory; 
+    protected $fillable = ['day', 'date', 'doctor_id'];
 }
