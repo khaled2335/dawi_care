@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Week_day;
 class Doctor extends Model
 {
     public $timestamps = false;
@@ -24,6 +24,10 @@ class Doctor extends Model
      protected $casts = [
         'worked_days' => 'string',
     ];
+    public function weekDays()
+    {
+        return $this->hasMany(Week_day::class);
+    }
 
 }
 
