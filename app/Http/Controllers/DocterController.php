@@ -70,19 +70,19 @@ class DocterController extends Controller
                 $doctors = Doctor::all();
 
             // Loop through each doctor and update the number of working days
-              foreach ($doctors as $doctor) {         
-                if (isset($doctor->worked_days)) {
-                    // Convert comma-separated string to an array
-                    $workedDaysArray = array_map('trim', explode(',', $doctor->worked_days));
-                    // Filter out empty values and count the number of working days
-                    $doctor->num_working_days = count(array_filter($workedDaysArray));
-                } else {
-                    $doctor->num_working_days = 0;
-                }
+            //   foreach ($doctors as $doctor) {         
+            //     if (isset($doctor->worked_days)) {
+            //         // Convert comma-separated string to an array
+            //         $workedDaysArray = array_map('trim', explode(',', $doctor->worked_days));
+            //         // Filter out empty values and count the number of working days
+            //         $doctor->num_working_days = count(array_filter($workedDaysArray));
+            //     } else {
+            //         $doctor->num_working_days = 0;
+            //     }
 
-                // Save the updated doctor record
-                $doctor->save();
-            }
+            //     // Save the updated doctor record
+            //     $doctor->save();
+            // }
 
                 } else {
                     return response()->json(['message' => 'Registration failed']);
