@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Doctor;
+use App\Models\Week_day;
 use Hash;
 use Auth;
 class DocterController extends Controller
@@ -59,7 +60,6 @@ class DocterController extends Controller
             $doctor->profile_photo = asset('photos/doctor_photo/' . $doctor_image_name); 
             $doctor->scientific_degree = $request->scientific_degree;
             $doctor->union_registration = asset('photos/union_registration_file/' . $union_registration_file); 
-            $doctor->worked_days = $request->worked_days;
             $doctor->specialty = $request->specialty;
             $doctor->fixed_salary = $request->fixed_salary;
             $res = $doctor->save();
