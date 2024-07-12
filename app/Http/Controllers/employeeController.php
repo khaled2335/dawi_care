@@ -67,7 +67,7 @@ class employeeController extends Controller
                     $employee->save();
                 }      
            } 
-                return response()->json(['message' => 'Employee added successfully', 'doctor' => $employee]);
+                return response()->json(['message' => 'Employee added successfully', 'employee' => $employee]);
            
         }
         return response()->json(['message' => 'Unauthorized'], 403);
@@ -116,18 +116,32 @@ class employeeController extends Controller
             $employee->phone_number = $request->phone_number;
             $employee->description = $request->description;
             $employee->fixed_salary = $request->fixed_salary;
-         
+            $employee->worked_days = $request->worked_days;
             $res = $employee->save();
             if ($res) {
-                return response()->json(['message' => 'employee updated successfully', 'employee' => $employee]);
-            } else {
-                return response()->json(['message' => 'Update failed']);
-            }
+        
+                  $employees = Employee::all();
+    
+                  foreach ($employees as $employee) {         
+                    if (isset($employee->worked_days)) {
+                        // Convert comma-separated string to an array
+                        $workedDaysArray = array_map('trim', explode(',', $employee->worked_days));
+                        // Filter out empty values and count the number of working days
+                        $employee->num_working_days = count(array_filter($workedDaysArray));
+                    } else {
+                        $employee->num_working_days = 0;
+                    }
+    
+                    // Save the updated doctor record
+                    $employee->save();
+                }      
+           } 
+                return response()->json(['message' => 'Employee updated successfully', 'employee' => $employee]);
+           
         }
         return response()->json(['message' => 'Unauthorized'], 403);
-    }
    
-
+    }
     /**
      * Remove the specified resource from storage.
      */
