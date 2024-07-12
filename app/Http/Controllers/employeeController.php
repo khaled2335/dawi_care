@@ -37,7 +37,6 @@ class employeeController extends Controller
                 'national_id' => 'required|numeric', // National ID is required, must be numeric and exactly 10 digits
                 'phone_number' => 'required|string|regex:/^\+?[0-9]{7,15}$/', // Phone number is required, should be a string, and match the regex pattern
                 'fixed_salary' => 'required|numeric|min:0', // Fixed salary is required, must be numeric, and at least 0
-                'overtime_salary' => 'numeric|min:0', // Overtime salary must be numeric, and at least 0
                
             ]);
 
@@ -48,12 +47,28 @@ class employeeController extends Controller
             $employee->phone_number = $request->phone_number;
             $employee->description = $request->description;
             $employee->fixed_salary = $request->fixed_salary;
+            $employee->worked_days = $request->worked_days;
             $res = $employee->save();
             if ($res) {
+        
+                  $employees = Employee::all();
+    
+                  foreach ($employees as $employee) {         
+                    if (isset($employee->worked_days)) {
+                        // Convert comma-separated string to an array
+                        $workedDaysArray = array_map('trim', explode(',', $employee->worked_days));
+                        // Filter out empty values and count the number of working days
+                        $employee->num_working_days = count(array_filter($workedDaysArray));
+                    } else {
+                        $employee->num_working_days = 0;
+                    }
+    
+                    // Save the updated doctor record
+                    $employee->save();
+                }      
+           } 
                 return response()->json(['message' => 'Employee added successfully', 'doctor' => $employee]);
-            } else {
-                return response()->json(['message' => 'Registration failed']);
-            }
+           
         }
         return response()->json(['message' => 'Unauthorized'], 403);
     }
@@ -92,7 +107,6 @@ class employeeController extends Controller
                 'national_id' => 'required|numeric', // National ID is required, must be numeric and exactly 10 digits
                 'phone_number' => 'required|string|regex:/^\+?[0-9]{7,15}$/', // Phone number is required, should be a string, and match the regex pattern
                 'fixed_salary' => 'required|numeric|min:0', // Fixed salary is required, must be numeric, and at least 0
-                'overtime_salary' => 'numeric|min:0', // Overtime salary must be numeric, and at least 0
             ]);
 
     
@@ -101,7 +115,6 @@ class employeeController extends Controller
             $employee->national_id = $request->national_id;
             $employee->phone_number = $request->phone_number;
             $employee->description = $request->description;
-            $employee->overtime_salary = $request->overtime_salary;
             $employee->fixed_salary = $request->fixed_salary;
          
             $res = $employee->save();

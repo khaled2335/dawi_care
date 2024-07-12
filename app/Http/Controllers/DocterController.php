@@ -82,12 +82,11 @@ class DocterController extends Controller
 
             //     // Save the updated doctor record
             //     $doctor->save();
-            // }
-
-                } else {
-                    return response()->json(['message' => 'Registration failed']);
-                }
+            // } 
             return response()->json(['message' => 'Doctor added successfully', 'doctor' => $doctor]);
+
+                } 
+           
             }
             return response()->json(['message' => 'Unauthorized'], 403);
     }
