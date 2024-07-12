@@ -92,56 +92,57 @@ class employeeController extends Controller
      */
    
    
-    public function edit(string $id, Request $request)
-    {
-        $admin = Auth::user();
-        if ($admin && $admin->role == 'admin') {
-            $employee = Employee::find($id);
-            if (!$employee) {
-                return response()->json(['message' => 'employee not found'], 404);
-            }
-    
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'description' => 'string|max:1000', // Description must be a string and max length of 1000 characters
-                'national_id' => 'required|numeric', // National ID is required, must be numeric and exactly 10 digits
-                'phone_number' => 'required|string|regex:/^\+?[0-9]{7,15}$/', // Phone number is required, should be a string, and match the regex pattern
-                'fixed_salary' => 'required|numeric|min:0', // Fixed salary is required, must be numeric, and at least 0
-            ]);
-
-    
-            
-            $employee->name = $request->name;
-            $employee->national_id = $request->national_id;
-            $employee->phone_number = $request->phone_number;
-            $employee->description = $request->description;
-            $employee->fixed_salary = $request->fixed_salary;
-            $employee->worked_days = $request->worked_days;
-            $res = $employee->save();
-            if ($res) {
-        
-                  $employees = Employee::all();
-    
-                  foreach ($employees as $employee) {         
-                    if (isset($employee->worked_days)) {
-                        // Convert comma-separated string to an array
-                        $workedDaysArray = array_map('trim', explode(',', $employee->worked_days));
-                        // Filter out empty values and count the number of working days
-                        $employee->num_working_days = count(array_filter($workedDaysArray));
-                    } else {
-                        $employee->num_working_days = 0;
-                    }
-    
-                    // Save the updated doctor record
-                    $employee->save();
-                }      
-           } 
-                return response()->json(['message' => 'Employee updated successfully', 'employee' => $employee]);
-           
-        }
-        return response()->json(['message' => 'Unauthorized'], 403);
-   
-    }
+     public function edit(string $id, Request $request)
+     {
+         $admin = Auth::user();
+         if ($admin && $admin->role == 'admin') {
+             $employee = Employee::find($id);
+             if (!$employee) {
+                 return response()->json(['message' => 'Employee not found'], 404);
+             }
+ 
+             $request->validate([
+                 'name' => 'required|string|max:255',
+                 'description' => 'nullable|string|max:1000', // Description is optional, must be a string and max length of 1000 characters
+                 'national_id' => 'required|numeric', // National ID is required, must be numeric
+                 'phone_number' => 'required|string|regex:/^\+?[0-9]{7,15}$/', // Phone number is required, should be a string, and match the regex pattern
+                 'fixed_salary' => 'required|numeric|min:0', // Fixed salary is required, must be numeric, and at least 0
+                 'worked_days' => 'nullable|string|max:255', // Ensure worked_days is a string and does not exceed 255 characters
+             ]);
+ 
+             // Update employee attributes
+             $employee->name = $request->name;
+             $employee->national_id = $request->national_id;
+             $employee->phone_number = $request->phone_number;
+             $employee->description = $request->description;
+             $employee->fixed_salary = $request->fixed_salary;
+             $employee->worked_days = $request->worked_days;
+             
+             $res = $employee->save();
+             if ($res) {
+                 $employees = Employee::all();
+ 
+                 foreach ($employees as $employee) {         
+                     if (isset($employee->worked_days)) {
+                         // Convert comma-separated string to an array
+                         $workedDaysArray = array_map('trim', explode(',', $employee->worked_days));
+                         // Filter out empty values and count the number of working days
+                         $employee->num_working_days = count(array_filter($workedDaysArray));
+                     } else {
+                         $employee->num_working_days = 0;
+                     }
+ 
+                     // Save the updated employee record
+                     $employee->save();
+                 }
+             }
+ 
+             return response()->json(['message' => 'Employee updated successfully', 'employee' => $employee]);
+         }
+ 
+         return response()->json(['message' => 'Unauthorized'], 403);
+     }
+ 
     /**
      * Remove the specified resource from storage.
      */
