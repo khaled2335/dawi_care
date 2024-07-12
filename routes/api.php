@@ -51,5 +51,6 @@ Route::post('Delete_Employee/{id}' , [employeeController::class,'destroy'] )->mi
 Route::post('Add_Week_day/{id}' , [week_days::class,'create'] )->middleware('auth');
 Route::get('All_Week_day' , [week_days::class,'index'] )->middleware('auth');
 Route::get('Show_Week_day/{id}' , [week_days::class,'show'] )->middleware('auth');
-Route::post('Edit_Week_day/{doctorId}' , [week_days::class,'edit'] )->middleware('auth');
+Route::post('Edit_Week_day/{id}' , [week_days::class,'edit'] )->middleware('auth');
+Route::post('Edit_all_Week_day/{id}' , [week_days::class,'editall'] )->middleware('auth');
 Route::post('Delete_Week_day/{id}' , [week_days::class,'destroy'] )->middleware('auth');

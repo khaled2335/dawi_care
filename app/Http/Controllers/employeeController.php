@@ -107,7 +107,7 @@ class employeeController extends Controller
                  'national_id' => 'required|numeric', // National ID is required, must be numeric
                  'phone_number' => 'required|string|regex:/^\+?[0-9]{7,15}$/', // Phone number is required, should be a string, and match the regex pattern
                  'fixed_salary' => 'required|numeric|min:0', // Fixed salary is required, must be numeric, and at least 0
-                 'worked_days' => 'nullable|string|max:255', // Ensure worked_days is a string and does not exceed 255 characters
+                 'worked_days' => 'string|max:255', // Ensure worked_days is a string and does not exceed 255 characters
              ]);
  
              // Update employee attributes
