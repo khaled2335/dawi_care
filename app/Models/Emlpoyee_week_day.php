@@ -5,14 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Employee extends Model
+class Emlpoyee_week_day extends Model
 {
-    public $timestamps = false;
     use HasFactory;
-
-
-    public function Emlpoyee_week_day()
+    public $timestamps = false;
+    public function employee()
     {
-        return $this->hasMany(Emlpoyee_week_day::class);
+        return $this->belongsTo(Employee::class);
     }
 }

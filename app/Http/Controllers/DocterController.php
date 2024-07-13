@@ -31,21 +31,7 @@ class DocterController extends Controller
         $admin = Auth::user();
         if ($admin && $admin->role == 'admin') { 
            
-            // $request->validate(
-            //     [
-            //         'name' => 'required|string|max:255',
-            //          'national_id' => 'required|digits_between:10,20|unique:doctors,national_id',
-            //          'phone_number' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:doctors,phone_number',
-            //          'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            //          'union_registration' => 'required||max:255',
-            //          'specialty' => 'required',
-            //          'scientific_degree' => 'required|max:255',
-            //          'worked_days' => 'required|integer|min:0',
-            //          'fixed_salary' => 'required|numeric|min:0',
-                  
-            //     ]
-            // );
-
+          
             // Handle profile photo upload
             $doctor_image_name = rand() . '.' .$request->profile_photo->getClientOriginalExtension(); 
             $request->profile_photo->move(public_path('/photos/doctor_photo'),$doctor_image_name);
@@ -65,28 +51,9 @@ class DocterController extends Controller
             $res = $doctor->save();
             if ($res) {
 
-               
-               
-                $doctors = Doctor::all();
-
-            // Loop through each doctor and update the number of working days
-            //   foreach ($doctors as $doctor) {         
-            //     if (isset($doctor->worked_days)) {
-            //         // Convert comma-separated string to an array
-            //         $workedDaysArray = array_map('trim', explode(',', $doctor->worked_days));
-            //         // Filter out empty values and count the number of working days
-            //         $doctor->num_working_days = count(array_filter($workedDaysArray));
-            //     } else {
-            //         $doctor->num_working_days = 0;
-            //     }
-
-            //     // Save the updated doctor record
-            //     $doctor->save();
-            // } 
             return response()->json(['message' => 'Doctor added successfully', 'doctor' => $doctor]);
-
-                } 
-           
+            }     
+                
             }
             return response()->json(['message' => 'Unauthorized'], 403);
     }
