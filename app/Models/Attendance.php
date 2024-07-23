@@ -14,6 +14,10 @@ class Attendance extends Model
     public function attendanceweekday()
     {
         return $this->belongsTo(Week_day::class);
+       
     }
-
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
 }
