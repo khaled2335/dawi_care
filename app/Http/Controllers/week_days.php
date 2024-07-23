@@ -6,8 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Doctor;
 use App\Models\Week_day;
+use App\Models\Attendance;
 use Hash;
 use Auth;
+use Carbon\Carbon;
+
 
 class week_days extends Controller
 {
@@ -105,6 +108,8 @@ class week_days extends Controller
    return response()->json(['message' => 'Unauthorized'], 403); 
 
  }
+
+ 
 
 
  

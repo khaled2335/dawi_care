@@ -7,6 +7,7 @@ use App\Http\Controllers\DocterController;
 use App\Http\Controllers\employeeController;
 use App\Http\Controllers\week_days;
 use App\Http\Controllers\employee_weekdays_controller;
+use App\Http\Controllers\AttendanceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,3 +63,8 @@ Route::get('Show_employee_weekdays/{id}' , [employee_weekdays_controller::class,
 Route::post('Edit_employee_weekdays/{id}' , [employee_weekdays_controller::class,'edit'] )->middleware('auth');
 Route::post('Edit_all_employee_weekdays/{id}' , [employee_weekdays_controller::class,'editall'] )->middleware('auth');
 Route::post('Delete_employee_weekdays/{id}' , [employee_weekdays_controller::class,'destroy'] )->middleware('auth');
+################################    attendance        ##########################################################
+
+Route::get('add_attendance' , [AttendanceController::class,'add_attendance'] );
+Route::get('getattendance' , [AttendanceController::class,'index'] );
+Route::post('attendencezero/{id}' , [AttendanceController::class,'attendencezero'] );
