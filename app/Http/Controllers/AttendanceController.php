@@ -60,12 +60,43 @@ class AttendanceController extends Controller
         return response()->json($result);
     }
       
+    public function show($id)
+    {
+        
+        $weekdays = Week_day::with(['attendanceofweekday'])->where('id', $id)
+        ->first();
+
+        // $result = $weekdays->map(function ($weekday) {
+        //     return [
+        //         'id' => $weekday->id,
+        //         'day' => $weekday->day,
+        //         'revenue' => $weekday->revenue,
+        //         'doctor_id' => $weekday->doctor_id,
+        //         'doctor_name' => $weekday->doctor ? $weekday->doctor->name : null,
+        //         'created_at' => $weekday->created_at,
+        //         'attendanceofweekday' => $weekday->attendanceofweekday->map(function ($attendance) {
+        //             return [
+        //                 'id' => $attendance->id,
+        //                 'attendance' => $attendance->attedance,
+        //                 'day_id' => $attendance->day_id,
+        //                 'created_at' => $attendance->created_at,
+        //             ];
+        //         }),
+        //     ];
+        // });
+
+        return response()->json($weekdays);
+    }
+      
 
      public function attendencezero($id , Request $request)
     {
         Carbon::setLocale('ar'); 
         $today = Carbon::now()->locale('ar')->isoFormat('dddd');//الاحد
-     
+        $exist = Attendance::find($id);
+        if ($exist && $exist->created_at = $request->created_at ) {
+            return response()->json(['message' => 'attendance already taken'], 200); 
+        }
             $attendance = new Attendance;
             $attendance->day_id = $id;
             $attendance->attedance = 0;
