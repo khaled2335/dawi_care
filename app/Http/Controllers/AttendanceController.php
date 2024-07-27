@@ -61,7 +61,7 @@ class AttendanceController extends Controller
     }
       
 
-     public function attendencezero($id)
+     public function attendencezero($id , Request $request)
     {
         Carbon::setLocale('ar'); 
         $today = Carbon::now()->locale('ar')->isoFormat('dddd');//الاحد
@@ -69,10 +69,31 @@ class AttendanceController extends Controller
             $attendance = new Attendance;
             $attendance->day_id = $id;
             $attendance->attedance = 0;
+            if ($request->created_at) {
+                $attendance->created_at = $request->created_at;
+            }
             $attendance->save();
         
         return response()->json(['message' => 'take attendance'], 200); 
     }
+
+        public function deleteattendence(Request $request)
+    {
+        $targetDate = Carbon::parse($request->date)->startOfDay();
+        
+        $attendances = Attendance::whereDate('created_at', $targetDate)->get();
+        
+        if ($attendances->isEmpty()) {
+            return response()->json(['message' => 'No attendance records found for the given date'], 404);
+        }
+        
+        foreach ($attendances as $attendance) {
+            $attendance->delete();
+        }
+        
+        return response()->json(['message' => 'Attendance records deleted successfully'], 200);
+    }
+
 
 
 
