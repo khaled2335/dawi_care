@@ -127,7 +127,7 @@ class AttendanceController extends Controller
         $targetDate = Carbon::parse($request->date)->startOfDay();
         
         $attendance = Attendance::whereDate('created_at', $targetDate)
-            ->where('id', $id)
+            ->where('day_id', $id)
             ->first();
         
         if (!$attendance) {
