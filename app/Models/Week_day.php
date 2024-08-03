@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Doctor;
+use App\Models\Employee;
 
 class Week_day extends Model
 {
@@ -21,7 +22,7 @@ class Week_day extends Model
     }
     public function attendanceofweekday()
     {
-        return $this->hasMany(Attendance::class , 'day_id');
+        return $this->hasMany(Attendance::class ,'day_id');
     }
 
 }
