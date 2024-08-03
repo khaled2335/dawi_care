@@ -15,6 +15,10 @@ class Week_day extends Model
     {
         return $this->belongsTo(Doctor::class);
     }
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
     public function attendanceofweekday()
     {
         return $this->hasMany(Attendance::class , 'day_id');

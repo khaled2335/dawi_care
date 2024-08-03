@@ -11,8 +11,9 @@ class Employee extends Model
     use HasFactory;
 
 
-    public function Emlpoyee_week_day()
+    public function week_day()
     {
-        return $this->hasMany(Emlpoyee_week_day::class);
+        return $this->hasMany(Week_day::class);
     }
+  
 }

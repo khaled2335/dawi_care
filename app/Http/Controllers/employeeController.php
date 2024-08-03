@@ -17,7 +17,7 @@ class employeeController extends Controller
     {
         $admin = Auth::user();
         if ($admin && $admin->role == 'admin') { 
-            $employee = Employee::with('Emlpoyee_week_day')->get();   
+            $employee = Employee::with('week_day')->get();   
             return response()->json($employee);
         }
         return response()->json(['message' => 'Unauthorized'], 403);

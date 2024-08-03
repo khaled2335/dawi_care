@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Doctor;
 use App\Models\Week_day;
 use App\Models\Attendance;
+
+use App\Models\Employee;
 use Hash;
 use Auth;
 use Carbon\Carbon;
@@ -29,40 +31,62 @@ class week_days extends Controller
      */
   
     
- public function create(Request $request, $id)
- {
-     // Get the raw string data from the request
-     $rawData = $request->input('data');
-
-     // Parse the raw data into an array
-     $elements = explode(',', $rawData); // Assuming the string is comma-separated
-
-     // Ensure the array has an even number of elements
-     if (count($elements) % 2 !== 0) {
-         return response()->json(['error' => 'Data is not in valid pairs'], 400);
-     }
-
-     // Insert each pair into the database
-     for ($i = 0; $i < count($elements); $i += 4) {
-         // Insert the first pair
-         $weekDay1 = new Week_day();
-         $weekDay1->day = $elements[$i];
-         $weekDay1->date = $elements[$i + 1];
-         $weekDay1->doctor_id = $id;
-         $weekDay1->save();
-
-         // Insert the second pair, if available
-         if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
-             $weekDay2 = new Week_day();
-             $weekDay2->day = $elements[$i + 2];
-             $weekDay2->date = $elements[$i + 3];
-             $weekDay2->doctor_id = $id;
-             $weekDay2->save();
+     public function create(Request $request, $id)
+     {
+         // Get the raw string data from the request
+         $rawData = $request->input('data');
+         $type = $request->input('type');
+    
+         // Parse the raw data into an array
+         $elements = explode(',', $rawData); // Assuming the string is comma-separated
+    
+         // Ensure the array has an even number of elements
+         
+         
+         if ($type === 'doctor') {
+            
+             if (count($elements) % 2 !== 0) {
+             return response()->json(['error' => 'Data is not in valid pairs'], 400);
+            }
+            // Insert each pair into the database
+            for ($i = 0; $i < count($elements); $i += 4) {
+                // Insert the first pair
+                $weekDay1 = new Week_day();
+                $weekDay1->day = $elements[$i];
+                $weekDay1->date = $elements[$i + 1];
+                $weekDay1->doctor_id = $id;
+                $weekDay1->save();
+    
+                // Insert the second pair, if available
+                if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
+                    $weekDay2 = new Week_day();
+                    $weekDay2->day = $elements[$i + 2];
+                    $weekDay2->date = $elements[$i + 3];
+                    $weekDay2->doctor_id = $id;
+                    $weekDay2->save();
+                }
          }
+    
+             return response()->json(['message' => 'Data inserted successfully']);
+        }
+        if ($type === 'employee'){
+            if (count($elements) == 0) {
+                return response()->json(['error' => 'days empty'], 400);
+            }
+       
+            for ($i=0 ; $i < count($elements); $i++) { 
+                
+                $e_weekdays = new Week_day;
+                $e_weekdays->day = $elements[$i];
+                $e_weekdays->emplyee_id = $id;
+                $e_weekdays->save();
+                
+    
+            }
+            return response()->json(['message' => 'days inserted succssfully'], 200);
+        }
      }
-
-     return response()->json(['message' => 'Data inserted successfully']);
- }
+    
 
   
  public function edit(Request $request, $id)
