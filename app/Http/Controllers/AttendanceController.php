@@ -36,7 +36,7 @@ class AttendanceController extends Controller
     public function index()
     {
         
-        $weekdays = Week_day::with(['attendanceofweekday', 'doctor'])->get();
+        $weekdays = Week_day::with(['attendanceofweekday', 'doctor','employe'])->get();
 
         $result = $weekdays->map(function ($weekday) {
             return [
@@ -44,6 +44,7 @@ class AttendanceController extends Controller
                 'day' => $weekday->day,
                 'revenue' => $weekday->revenue,
                 'doctor_id' => $weekday->doctor_id,
+                'emplyee_id' => $weekday->emplyee_id,
                 'doctor_name' => $weekday->doctor ? $weekday->doctor->name : null,
                 'created_at' => $weekday->created_at,
                 'attendanceofweekday' => $weekday->attendanceofweekday->map(function ($attendance) {
