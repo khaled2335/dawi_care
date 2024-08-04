@@ -18,7 +18,7 @@ class Week_day extends Model
     }
     public function employee()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(Employee::class , 'emplyee_id');
     }
     public function attendanceofweekday()
     {
