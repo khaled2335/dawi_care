@@ -45,8 +45,7 @@ class AttendanceController extends Controller
                 'revenue' => $weekday->revenue,
                 'doctor_id' => $weekday->doctor_id,
                 'emplyee_id' => $weekday->emplyee_id,
-                'doctor_name' => $weekday->doctor ? $weekday->doctor->name : null,
-                'employee_name' => $weekday->employee ? $weekday->employee->name : null,
+                'name' => $weekday->doctor_id ? ($weekday->doctor ? $weekday->doctor->name : null) : ($weekday->employee ? $weekday->employee->name : null),
                 'created_at' => $weekday->created_at,
                 'attendanceofweekday' => $weekday->attendanceofweekday->map(function ($attendance) {
                     return [
@@ -63,36 +62,67 @@ class AttendanceController extends Controller
     }
       
     public function show($doctorId)
-{
-    $result = DB::table('week_days')
-        ->join('attendances', 'week_days.id', '=', 'attendances.day_id')
-        ->join('doctors', 'week_days.doctor_id', '=', 'doctors.id')
-        ->select(
-            'doctors.name',
-            'week_days.day',
-            'attendances.attedance as attendance',
-            DB::raw('DATE(attendances.created_at) as attendance_date')
-        )
-        ->where('doctors.id', $doctorId)
-        ->get()
-        ->groupBy('name')
-        ->map(function ($group) {
-            return [
-                'name' => $group[0]->name,
-                'attendance_data' => $group->map(function ($item) {
-                    return [
-                        'day' => $item->day,
-                        'attendance' => $item->attendance,
-                        'date' => $item->attendance_date
-                    ];
-                })->values()->toArray()
-            ];
-        })
-        ->values()
-        ->first();
-
-    return response()->json($result);
-}
+    {
+        $result = DB::table('week_days')
+            ->join('attendances', 'week_days.id', '=', 'attendances.day_id')
+            ->join('doctors', 'week_days.doctor_id', '=', 'doctors.id')
+            ->select(
+                'doctors.name',
+                'week_days.day',
+                'attendances.attedance as attendance',
+                DB::raw('DATE(attendances.created_at) as attendance_date')
+            )
+            ->where('doctors.id', $doctorId)
+            ->get()
+            ->groupBy('name')
+            ->map(function ($group) {
+                return [
+                    'name' => $group[0]->name,
+                    'attendance_data' => $group->map(function ($item) {
+                        return [
+                            'day' => $item->day,
+                            'attendance' => $item->attendance,
+                            'date' => $item->attendance_date
+                        ];
+                    })->values()->toArray()
+                ];
+            })
+            ->values()
+            ->first();
+    
+        return response()->json($result);
+    }
+    public function showemployee($employeeId)
+    {
+        $result = DB::table('week_days')
+            ->join('attendances', 'week_days.id', '=', 'attendances.day_id')
+            ->join('employees', 'week_days.emplyee_id', '=', 'employees.id')
+            ->select(
+                'employees.name',
+                'week_days.day',
+                'attendances.attedance as attendance',
+                DB::raw('DATE(attendances.created_at) as attendance_date')
+            )
+            ->where('employees.id', $employeeId)
+            ->get()
+            ->groupBy('name')
+            ->map(function ($group) {
+                return [
+                    'name' => $group[0]->name,
+                    'attendance_data' => $group->map(function ($item) {
+                        return [
+                            'day' => $item->day,
+                            'attendance' => $item->attendance,
+                            'date' => $item->attendance_date
+                        ];
+                    })->values()->toArray()
+                ];
+            })
+            ->values()
+            ->first();
+    
+        return response()->json($result);
+    }
 
     public function attendencezero($id, Request $request)
     {

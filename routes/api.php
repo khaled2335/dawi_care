@@ -68,5 +68,6 @@ Route::post('Delete_employee_weekdays/{id}' , [employee_weekdays_controller::cla
 Route::get('add_attendance' , [AttendanceController::class,'add_attendance'] );
 Route::get('getattendance' , [AttendanceController::class,'index'] );
 Route::get('get_doctor_attendence/{doctorId}' , [AttendanceController::class,'show'] );
+Route::get('get_employee_attendence/{employeeId}' , [AttendanceController::class,'showemployee'] );
 Route::post('attendencezero/{id}' , [AttendanceController::class,'attendencezero'] );
 Route::post('deleteattendence/{id}' , [AttendanceController::class,'deleteattendence'] );
