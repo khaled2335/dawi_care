@@ -6,7 +6,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DocterController;
 use App\Http\Controllers\employeeController;
 use App\Http\Controllers\week_days;
-use App\Http\Controllers\employee_weekdays_controller;
 use App\Http\Controllers\AttendanceController;
 
 /*
@@ -56,13 +55,8 @@ Route::get('Show_Week_day/{id}' , [week_days::class,'show'] )->middleware('auth'
 Route::post('Edit_Week_day/{id}' , [week_days::class,'edit'] )->middleware('auth');
 Route::post('Edit_all_Week_day/{id}' , [week_days::class,'editall'] )->middleware('auth');
 Route::post('Delete_Week_day/{id}' , [week_days::class,'destroy'] )->middleware('auth');
-################################      employee_worked_days         ##########################################################
-Route::post('Add_employee_weekdays/{id}' , [employee_weekdays_controller::class,'create'] )->middleware('auth');
-Route::get('All_employee_weekdays' , [employee_weekdays_controller::class,'index'] )->middleware('auth');
-Route::get('Show_employee_weekdays/{id}' , [employee_weekdays_controller::class,'show'] )->middleware('auth');
-Route::post('Edit_employee_weekdays/{id}' , [employee_weekdays_controller::class,'edit'] )->middleware('auth');
-Route::post('Edit_all_employee_weekdays/{id}' , [employee_weekdays_controller::class,'editall'] )->middleware('auth');
-Route::post('Delete_employee_weekdays/{id}' , [employee_weekdays_controller::class,'destroy'] )->middleware('auth');
+Route::get('numberofweekdays' , [week_days::class,'calculateAllWorkingDaysForYear'] );
+
 ################################    attendance        ##########################################################
 
 Route::get('add_attendance' , [AttendanceController::class,'add_attendance'] );

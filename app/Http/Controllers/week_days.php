@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\Doctor;
 use App\Models\Week_day;
 use App\Models\Attendance;
-
 use App\Models\Employee;
 use Hash;
 use Auth;
@@ -132,30 +131,85 @@ class week_days extends Controller
    return response()->json(['message' => 'Unauthorized'], 403); 
 
  }
-
  
+ public function calculateAllWorkingDaysForYear(Request $request)
+ {
+     $year = $request->input('year', now()->year);
 
+     $dayMapping = [
+         'الأحد' => 'Sunday',
+         'الاثنين' => 'Monday',
+         'الثلاثاء' => 'Tuesday',
+         'الأربعاء' => 'Wednesday',
+         'الخميس' => 'Thursday',
+         'الجمعة' => 'Friday',
+         'السبت' => 'Saturday',
+     ];
 
- 
+     $results = [];
 
+     // Calculate for employees
+     $employees = Employee::all();
+     foreach ($employees as $employee) {
+         $workingDays = Week_day::where('emplyee_id', $employee->id)
+             ->pluck('day')
+             ->toArray();
 
+         $yearlyWorkingDays = $this->countYearlyWorkingDays($year, $workingDays, $dayMapping);
 
+         $results['employees'][] = [
+             'id' => $employee->id,
+             'num_working_days' => $yearlyWorkingDays
+         ];
+     }
 
+     // Calculate for doctors
+     $doctors = Doctor::all();
+     foreach ($doctors as $doctor) {
+         $workingDays = Week_day::where('doctor_id', $doctor->id)
+             ->pluck('day')
+             ->toArray();
 
+         $yearlyWorkingDays = $this->countYearlyWorkingDays($year, $workingDays, $dayMapping);
 
+         $results['doctors'][] = [
+             'id' => $doctor->id,
+             'num_working_days' => $yearlyWorkingDays
+         ];
+     }
 
+     return response()->json([
+         'year' => $year,
+         'results' => $results
+     ]);
+ }
 
+ private function countYearlyWorkingDays($year, $workingDays, $dayMapping)
+ {
+     $englishWorkingDays = array_map(function($day) use ($dayMapping) {
+         return $dayMapping[$day] ?? $day;
+     }, $workingDays);
 
+     $yearlyWorkingDays = [];
 
+     for ($month = 1; $month <= 12; $month++) {
+         $date = Carbon::create($year, $month, 1);
+         $daysInMonth = $date->daysInMonth;
+         $workingDayCount = 0;
 
+         for ($day = 1; $day <= $daysInMonth; $day++) {
+             $currentDay = $date->format('l'); // Get the day name
+             if (in_array($currentDay, $englishWorkingDays)) {
+                 $workingDayCount++;
+             }
+             $date->addDay();
+         }
 
+         $yearlyWorkingDays[$month] = $workingDayCount;
+     }
 
-
-
-
-
-
-
+     return $yearlyWorkingDays;
+ }
 
 
 
@@ -177,6 +231,51 @@ class week_days extends Controller
 
 
 }
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
 
 
