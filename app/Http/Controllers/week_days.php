@@ -108,9 +108,16 @@ class week_days extends Controller
  {
     $admin = Auth::user();
     if ($admin && $admin->role == 'admin') {
-    $weekday = Week_day::where('doctor_id' , $id )->delete();//doc_id
+        $doctorweekday = Week_day::where('doctor_id' , $id );
+        $employeeweekday = Week_day::where('emplyee_id' , $id );
+    if ($doctorweekday || $employeeweekday) {
+
+        $doctorweekday || $employeeweekday ->delete();
+        return $this->create($request, $id);
+       
+    } 
     
-    return $this->create($request, $id);
+    
 
  }
 }

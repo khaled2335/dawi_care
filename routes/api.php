@@ -55,7 +55,7 @@ Route::get('Show_Week_day/{id}' , [week_days::class,'show'] )->middleware('auth'
 Route::post('Edit_Week_day/{id}' , [week_days::class,'edit'] )->middleware('auth');
 Route::post('Edit_all_Week_day/{id}' , [week_days::class,'editall'] )->middleware('auth');
 Route::post('Delete_Week_day/{id}' , [week_days::class,'destroy'] )->middleware('auth');
-Route::get('numberofweekdays' , [week_days::class,'calculateAllWorkingDaysForYear'] );
+Route::post('numberofweekdays' , [week_days::class,'calculateAllWorkingDaysForYear'] );
 
 ################################    attendance        ##########################################################
 
