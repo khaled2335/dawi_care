@@ -32,14 +32,11 @@ class week_days extends Controller
     
      public function create(Request $request, $id)
      {
-         // Get the raw string data from the request
+        
          $rawData = $request->input('data');
          $type = $request->input('type');
     
-         // Parse the raw data into an array
-         $elements = explode(',', $rawData); // Assuming the string is comma-separated
-    
-         // Ensure the array has an even number of elements
+         $elements = explode(',', $rawData); 
          
          
          if ($type === 'doctor') {
@@ -47,16 +44,16 @@ class week_days extends Controller
              if (count($elements) % 2 !== 0) {
              return response()->json(['error' => 'Data is not in valid pairs'], 400);
             }
-            // Insert each pair into the database
+            
             for ($i = 0; $i < count($elements); $i += 4) {
-                // Insert the first pair
+          
                 $weekDay1 = new Week_day();
                 $weekDay1->day = $elements[$i];
                 $weekDay1->date = $elements[$i + 1];
                 $weekDay1->doctor_id = $id;
                 $weekDay1->save();
     
-                // Insert the second pair, if available
+                
                 if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
                     $weekDay2 = new Week_day();
                     $weekDay2->day = $elements[$i + 2];
@@ -105,21 +102,26 @@ class week_days extends Controller
 
  }
  public function editall(Request $request, $id)
- {
+{
     $admin = Auth::user();
     if ($admin && $admin->role == 'admin') {
-        $doctorweekday = Week_day::where('doctor_id' , $id );
-        $employeeweekday = Week_day::where('emplyee_id' , $id );
-    if ($doctorweekday || $employeeweekday) {
 
-        $doctorweekday || $employeeweekday ->delete();
-        return $this->create($request, $id);
-       
-    } 
-    
-    
+        $doctorweekday = Week_day::where('doctor_id', $id)->all();
+        $employeeweekday = Week_day::where('emplyee_id', $id)->all();
 
- }
+        if ($doctorweekday->exists() || $employeeweekday->exists()) {
+            if ($doctorweekday->exists()) {
+                $doctorweekday->delete();
+            }
+            if ($employeeweekday->exists()) {
+                $employeeweekday->delete();
+            }
+
+            return $this->create($request, $id);
+        }
+    }
+
+    return response()->json(['message' => 'Unauthorized or no weekdays found'], 403);
 }
  
 

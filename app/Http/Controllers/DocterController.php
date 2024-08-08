@@ -50,7 +50,34 @@ class DocterController extends Controller
             $doctor->fixed_salary = $request->fixed_salary;
             $res = $doctor->save();
             if ($res) {
-
+                
+                $rawData = $request->input('data');
+           
+                $elements = explode(',', $rawData); 
+                
+                    if (count($elements) % 2 !== 0) {
+                    return response()->json(['error' => 'Data is not in valid pairs'], 400);
+                   }
+                   
+                   for ($i = 0; $i < count($elements); $i += 4) {
+                 
+                       $weekDay1 = new Week_day();
+                       $weekDay1->day = $elements[$i];
+                       $weekDay1->date = $elements[$i + 1];
+                       $weekDay1->doctor_id = $doctor->id;
+                       $weekDay1->save();
+           
+                       
+                       if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
+                           $weekDay2 = new Week_day();
+                           $weekDay2->day = $elements[$i + 2];
+                           $weekDay2->date = $elements[$i + 3];
+                           $weekDay2->doctor_id = $doctor->id;
+                           $weekDay2->save();
+                       }
+                }
+           
+                  
             return response()->json(['message' => 'Doctor added successfully', 'doctor' => $doctor]);
             }     
                 

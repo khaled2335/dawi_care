@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Doctor;
 use App\Models\Employee;
+use App\Models\Week_day;
 use Hash;
 use Auth;
 use Illuminate\Http\Request;
@@ -50,6 +51,24 @@ class employeeController extends Controller
             
             $res = $employee->save();
             if ($res) {
+                
+                $rawData = $request->input('data');
+           
+                $elements = explode(',', $rawData); 
+                
+                if (count($elements) == 0) {
+                    return response()->json(['error' => 'days empty'], 400);
+                }
+           
+                for ($i=0 ; $i < count($elements); $i++) { 
+                    
+                    $e_weekdays = new Week_day;
+                    $e_weekdays->day = $elements[$i];
+                    $e_weekdays->emplyee_id = $employee->id;
+                    $e_weekdays->save();
+                    
+                }
+               
         
                 //   $employees = Employee::all();
     
