@@ -140,9 +140,13 @@ class week_days extends Controller
     
              return response()->json(['message' => 'doctor days updated successfully']);
         }
-        else {
-            $employeeweekday = Week_day::where('emplyee_id', $id)->get();
-            $employeeweekday->delete();
+        else { 
+
+            $employeeweekdays = Week_day::where('emplyee_id', $id)->get();
+            foreach ($employeeweekdays as $key => $employeeweekday) {
+                $employeeweekday->delete();
+            }
+          
             if (count($elements) == 0) {
                          return response()->json(['error' => 'days empty'], 400);
                      }
