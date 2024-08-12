@@ -105,17 +105,59 @@ class week_days extends Controller
 {
     $admin = Auth::user();
     if ($admin && $admin->role == 'admin') {
+        $rawData = $request->input('data');
         $type = $request->input('type');
+        $elements = explode(',', $rawData); 
 
         if ($type == 'doctor') {
-            $doctorweekday = Week_day::where('doctor_id', $id)->all();
-            $doctorweekday ->delete();
-            return $this->create($request, $id);
+            $doctorweekday = Week_day::where('doctor_id', $id)->get();
+            foreach ($doctorweekday as $key => $dweekday) {
+                 $dweekday->delete();
+            }
+           
+           
+             if (count($elements) % 2 !== 0) {
+             return response()->json(['error' => 'Data is not in valid pairs'], 400);
+            }
+            
+            for ($i = 0; $i < count($elements); $i += 4) {
+          
+                $weekDay1 = new Week_day();
+                $weekDay1->day = $elements[$i];
+                $weekDay1->date = $elements[$i + 1];
+                $weekDay1->doctor_id = $id;
+                $weekDay1->save();
+    
+                
+                if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
+                    $weekDay2 = new Week_day();
+                    $weekDay2->day = $elements[$i + 2];
+                    $weekDay2->date = $elements[$i + 3];
+                    $weekDay2->doctor_id = $id;
+                    $weekDay2->save();
+                }
+         }
+    
+             return response()->json(['message' => 'doctor days updated successfully']);
         }
         else {
-            $employeeweekday = Week_day::where('emplyee_id', $id)->all();
-            $employeeweekday ->delete();
-            return $this->create($request, $id);
+            $employeeweekday = Week_day::where('emplyee_id', $id)->get();
+            $employeeweekday->delete();
+            if (count($elements) == 0) {
+                         return response()->json(['error' => 'days empty'], 400);
+                     }
+                   
+                     for ($i=0 ; $i < count($elements); $i++) { 
+                            
+                           $e_weekdays = new Week_day;
+                           $e_weekdays->day = $elements[$i];
+                           $e_weekdays->emplyee_id = $id;
+                           $e_weekdays->save();
+                            
+                
+                      }
+                     return response()->json(['message' => ' employee days updated succssfully'], 200);
+                    
         }
     }
 
