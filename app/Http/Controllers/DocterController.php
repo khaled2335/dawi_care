@@ -205,7 +205,72 @@ class DocterController extends Controller
 
         $res = $doctor->save();
         if ($res) {
-            $doctors = Doctor::all();
+            $rawData = $request->input('data');
+            $elements = explode(',', $rawData); 
+    
+            
+                $doctorweekday = Week_day::where('doctor_id', $doctor->id)->get();
+                foreach ($doctorweekday as $key => $dweekday) {
+                     $dweekday->delete();
+                }
+               
+               
+                 if (count($elements) % 2 !== 0) {
+                 return response()->json(['error' => 'Data is not in valid pairs'], 400);
+                }
+                
+                for ($i = 0; $i < count($elements); $i += 4) {
+              
+                    $weekDay1 = new Week_day();
+                    $weekDay1->day = $elements[$i];
+                    $weekDay1->date = $elements[$i + 1];
+                    $weekDay1->doctor_id = $doctor->id;
+                    $weekDay1->save();
+        
+                    
+                    if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
+                        $weekDay2 = new Week_day();
+                        $weekDay2->day = $elements[$i + 2];
+                        $weekDay2->date = $elements[$i + 3];
+                        $weekDay2->doctor_id = $doctor->id;
+                        $weekDay2->save();
+                    }
+             }
+             $now = now();
+             $year = $request->input('year', $now->year);
+             $month = $request->input('month', $now->month);
+         
+             $dayMapping = [
+                 'الأحد' => 'Sunday',
+                 'الاثنين' => 'Monday',
+                 'الثلاثاء' => 'Tuesday',
+                 'الأربعاء' => 'Wednesday',
+                 'الخميس' => 'Thursday',
+                 'الجمعة' => 'Friday',
+                 'السبت' => 'Saturday',
+             ];
+         
+             $results = [];
+         
+         
+             
+             
+                 $workingDays = Week_day::where('doctor_id', $doctor->id)
+                     ->pluck('day')
+                     ->toArray();
+         
+                 $monthlyWorkingDays = $this->countMonthlyWorkingDays($year, $month, $workingDays, $dayMapping);
+         
+                 // Update the doctor's num_working_days
+                 $doctor->num_working_days = $monthlyWorkingDays;
+                 $doctor->save();
+         
+                 $results['doctors'][] = [
+                     'id' => $doctor->id,
+                     'num_working_days' => $monthlyWorkingDays
+                 ];
+             
+             
             return response()->json(['message' => 'Doctor updated successfully', 'doctor' => $doctor]);
         } else {
             return response()->json(['message' => 'Update failed']);

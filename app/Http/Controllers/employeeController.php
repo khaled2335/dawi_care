@@ -176,7 +176,61 @@ class employeeController extends Controller
              
              $res = $employee->save();
              if ($res) {
-                 
+                $rawData = $request->input('data');
+                $elements = explode(',', $rawData); 
+                $employeeweekdays = Week_day::where('emplyee_id', $employee->id)->get();
+                foreach ($employeeweekdays as $key => $employeeweekday) {
+                    $employeeweekday->delete();
+                }
+              
+                if (count($elements) == 0) {
+                             return response()->json(['error' => 'days empty'], 400);
+                         }
+                       
+                         for ($i=0 ; $i < count($elements); $i++) { 
+                                
+                               $e_weekdays = new Week_day;
+                               $e_weekdays->day = $elements[$i];
+                               $e_weekdays->emplyee_id = $employee->id;
+                               $e_weekdays->save();
+                                
+                    
+                          }
+                          $now = now();
+            $year = $request->input('year', $now->year);
+            $month = $request->input('month', $now->month);
+
+            $dayMapping = [
+                'الأحد' => 'Sunday',
+                'الاثنين' => 'Monday',
+                'الثلاثاء' => 'Tuesday',
+                'الأربعاء' => 'Wednesday',
+                'الخميس' => 'Thursday',
+                'الجمعة' => 'Friday',
+                'السبت' => 'Saturday',
+            ];
+
+            $results = [];
+
+            // Calculate and update for employees
+           
+            
+                $workingDays = Week_day::where('emplyee_id', $employee->id)
+                    ->pluck('day')
+                    ->toArray();
+
+                $monthlyWorkingDays = $this->countMonthlyWorkingDays($year, $month, $workingDays, $dayMapping);
+
+                // Update the employee's num_working_days
+                $employee->num_working_days = $monthlyWorkingDays;
+                $employee->save();
+
+                $results['employees'][] = [
+                    'id' => $employee->id,
+                    'num_working_days' => $monthlyWorkingDays
+                ];
+            
+
  
                  return response()->json(['message' => 'Employee updated successfully', 'employee' => $employee]);
              }
