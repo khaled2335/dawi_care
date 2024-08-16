@@ -1,12 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Http\Controllers\week_days;
 use App\Models\User;
 use App\Models\Doctor;
 use App\Models\Employee;
 use App\Models\Week_day;
 use Hash;
 use Auth;
+use Carbon\Carbon;
+
 use Illuminate\Http\Request;
 
 class employeeController extends Controller
@@ -68,6 +71,42 @@ class employeeController extends Controller
                     $e_weekdays->save();
                     
                 }
+
+            $now = now();
+            $year = $request->input('year', $now->year);
+            $month = $request->input('month', $now->month);
+
+            $dayMapping = [
+                'الأحد' => 'Sunday',
+                'الاثنين' => 'Monday',
+                'الثلاثاء' => 'Tuesday',
+                'الأربعاء' => 'Wednesday',
+                'الخميس' => 'Thursday',
+                'الجمعة' => 'Friday',
+                'السبت' => 'Saturday',
+            ];
+
+            $results = [];
+
+            // Calculate and update for employees
+           
+            
+                $workingDays = Week_day::where('emplyee_id', $employee->id)
+                    ->pluck('day')
+                    ->toArray();
+
+                $monthlyWorkingDays = $this->countMonthlyWorkingDays($year, $month, $workingDays, $dayMapping);
+
+                // Update the employee's num_working_days
+                $employee->num_working_days = $monthlyWorkingDays;
+                $employee->save();
+
+                $results['employees'][] = [
+                    'id' => $employee->id,
+                    'num_working_days' => $monthlyWorkingDays
+                ];
+            
+
                
         
                 //   $employees = Employee::all();
@@ -165,7 +204,26 @@ class employeeController extends Controller
        }
           return response()->json(['message' => 'Unauthorized'], 403); 
     }
+private function countMonthlyWorkingDays($year, $month, $workingDays, $dayMapping)
+{
+    $englishWorkingDays = array_map(function($day) use ($dayMapping) {
+        return $dayMapping[$day] ?? $day;
+    }, $workingDays);
 
+    $date = Carbon::create($year, $month, 1);
+    $daysInMonth = $date->daysInMonth;
+    $workingDayCount = 0;
+
+    for ($day = 1; $day <= $daysInMonth; $day++) {
+        $currentDay = $date->format('l'); // Get the day name
+        if (in_array($currentDay, $englishWorkingDays)) {
+            $workingDayCount++;
+        }
+        $date->addDay();
+    }
+
+    return $workingDayCount;
+}
 
 
 

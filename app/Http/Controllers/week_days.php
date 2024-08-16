@@ -186,83 +186,88 @@ class week_days extends Controller
  }
  
  public function calculateAllWorkingDaysForYear(Request $request)
- {
-     $year = $request->input('year', now()->year);
+{
+    $now = now();
+    $year = $request->input('year', $now->year);
+    $month = $request->input('month', $now->month);
 
-     $dayMapping = [
-         'الأحد' => 'Sunday',
-         'الاثنين' => 'Monday',
-         'الثلاثاء' => 'Tuesday',
-         'الأربعاء' => 'Wednesday',
-         'الخميس' => 'Thursday',
-         'الجمعة' => 'Friday',
-         'السبت' => 'Saturday',
-     ];
+    $dayMapping = [
+        'الأحد' => 'Sunday',
+        'الاثنين' => 'Monday',
+        'الثلاثاء' => 'Tuesday',
+        'الأربعاء' => 'Wednesday',
+        'الخميس' => 'Thursday',
+        'الجمعة' => 'Friday',
+        'السبت' => 'Saturday',
+    ];
 
-     $results = [];
+    $results = [];
 
-     // Calculate for employees
-     $employees = Employee::all();
-     foreach ($employees as $employee) {
-         $workingDays = Week_day::where('emplyee_id', $employee->id)
-             ->pluck('day')
-             ->toArray();
+    // Calculate and update for employees
+    $employees = Employee::all();
+    foreach ($employees as $employee) {
+        $workingDays = Week_day::where('emplyee_id', $employee->id)
+            ->pluck('day')
+            ->toArray();
 
-         $yearlyWorkingDays = $this->countYearlyWorkingDays($year, $workingDays, $dayMapping);
+        $monthlyWorkingDays = $this->countMonthlyWorkingDays($year, $month, $workingDays, $dayMapping);
 
-         $results['employees'][] = [
-             'id' => $employee->id,
-             'num_working_days' => $yearlyWorkingDays
-         ];
-     }
+        // Update the employee's num_working_days
+        $employee->num_working_days = $monthlyWorkingDays;
+        $employee->save();
 
-     // Calculate for doctors
-     $doctors = Doctor::all();
-     foreach ($doctors as $doctor) {
-         $workingDays = Week_day::where('doctor_id', $doctor->id)
-             ->pluck('day')
-             ->toArray();
+        $results['employees'][] = [
+            'id' => $employee->id,
+            'num_working_days' => $monthlyWorkingDays
+        ];
+    }
 
-         $yearlyWorkingDays = $this->countYearlyWorkingDays($year, $workingDays, $dayMapping);
+    // Calculate and update for doctors
+    $doctors = Doctor::all();
+    foreach ($doctors as $doctor) {
+        $workingDays = Week_day::where('doctor_id', $doctor->id)
+            ->pluck('day')
+            ->toArray();
 
-         $results['doctors'][] = [
-             'id' => $doctor->id,
-             'num_working_days' => $yearlyWorkingDays
-         ];
-     }
+        $monthlyWorkingDays = $this->countMonthlyWorkingDays($year, $month, $workingDays, $dayMapping);
 
-     return response()->json([
-         'year' => $year,
-         'results' => $results
-     ]);
- }
+        // Update the doctor's num_working_days
+        $doctor->num_working_days = $monthlyWorkingDays;
+        $doctor->save();
 
- private function countYearlyWorkingDays($year, $workingDays, $dayMapping)
- {
-     $englishWorkingDays = array_map(function($day) use ($dayMapping) {
-         return $dayMapping[$day] ?? $day;
-     }, $workingDays);
+        $results['doctors'][] = [
+            'id' => $doctor->id,
+            'num_working_days' => $monthlyWorkingDays
+        ];
+    }
 
-     $yearlyWorkingDays = [];
+    return response()->json([
+        'year' => $year,
+        'month' => $month,
+        'results' => $results
+    ]);
+}
 
-     for ($month = 1; $month <= 12; $month++) {
-         $date = Carbon::create($year, $month, 1);
-         $daysInMonth = $date->daysInMonth;
-         $workingDayCount = 0;
+private function countMonthlyWorkingDays($year, $month, $workingDays, $dayMapping)
+{
+    $englishWorkingDays = array_map(function($day) use ($dayMapping) {
+        return $dayMapping[$day] ?? $day;
+    }, $workingDays);
 
-         for ($day = 1; $day <= $daysInMonth; $day++) {
-             $currentDay = $date->format('l'); // Get the day name
-             if (in_array($currentDay, $englishWorkingDays)) {
-                 $workingDayCount++;
-             }
-             $date->addDay();
-         }
+    $date = Carbon::create($year, $month, 1);
+    $daysInMonth = $date->daysInMonth;
+    $workingDayCount = 0;
 
-         $yearlyWorkingDays[$month] = $workingDayCount;
-     }
+    for ($day = 1; $day <= $daysInMonth; $day++) {
+        $currentDay = $date->format('l'); // Get the day name
+        if (in_array($currentDay, $englishWorkingDays)) {
+            $workingDayCount++;
+        }
+        $date->addDay();
+    }
 
-     return $yearlyWorkingDays;
- }
+    return $workingDayCount;
+}
 
 
 

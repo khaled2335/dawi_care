@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Doctor;
+use App\Models\Employee;
 use App\Models\Week_day;
 use Hash;
 use Auth;
+use Carbon\Carbon;
+
 class DocterController extends Controller
 {
     /**
@@ -76,6 +79,42 @@ class DocterController extends Controller
                            $weekDay2->save();
                        }
                 }
+                $now = now();
+                $year = $request->input('year', $now->year);
+                $month = $request->input('month', $now->month);
+            
+                $dayMapping = [
+                    'الأحد' => 'Sunday',
+                    'الاثنين' => 'Monday',
+                    'الثلاثاء' => 'Tuesday',
+                    'الأربعاء' => 'Wednesday',
+                    'الخميس' => 'Thursday',
+                    'الجمعة' => 'Friday',
+                    'السبت' => 'Saturday',
+                ];
+            
+                $results = [];
+            
+            
+                
+                
+                    $workingDays = Week_day::where('doctor_id', $doctor->id)
+                        ->pluck('day')
+                        ->toArray();
+            
+                    $monthlyWorkingDays = $this->countMonthlyWorkingDays($year, $month, $workingDays, $dayMapping);
+            
+                    // Update the doctor's num_working_days
+                    $doctor->num_working_days = $monthlyWorkingDays;
+                    $doctor->save();
+            
+                    $results['doctors'][] = [
+                        'id' => $doctor->id,
+                        'num_working_days' => $monthlyWorkingDays
+                    ];
+                
+                
+            
            
                   
             return response()->json(['message' => 'Doctor added successfully', 'doctor' => $doctor]);
@@ -176,13 +215,11 @@ class DocterController extends Controller
 }
 
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    
     public function destroy(string $id)
     {
         $admin = Auth::user();
-     if ($admin && $admin->role == 'admin') {     // Find the doctor by ID
+     if ($admin && $admin->role == 'admin') {   
     $doctor = Doctor::find($id);
 
     if (!$doctor) {
@@ -192,21 +229,21 @@ class DocterController extends Controller
         ], 404);
     }
 
-    // Define paths to the files
+    
     $profile_photo_path = public_path('/photos/doctor_photo/' . basename($doctor->profile_photo));
     $union_registration_path = public_path('/photos/union_registration_file/' . basename($doctor->union_registration));
 
-    // Delete the profile photo if it exists
+   
     if (file_exists($profile_photo_path)) {
         unlink($profile_photo_path);
     }
 
-    // Delete the scientific degree file if it exists
+    
     if (file_exists($union_registration_path)) {
         unlink($union_registration_path);
     }
 
-    // Delete the doctor record
+
     if ($doctor->delete()) {
         return response()->json([
             'status' => 'success',
@@ -221,7 +258,48 @@ class DocterController extends Controller
      }
     }
 
+    private function countMonthlyWorkingDays($year, $month, $workingDays, $dayMapping)
+    {
+        $englishWorkingDays = array_map(function($day) use ($dayMapping) {
+            return $dayMapping[$day] ?? $day;
+        }, $workingDays);
+    
+        $date = Carbon::create($year, $month, 1);
+        $daysInMonth = $date->daysInMonth;
+        $workingDayCount = 0;
+    
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $currentDay = $date->format('l'); // Get the day name
+            if (in_array($currentDay, $englishWorkingDays)) {
+                $workingDayCount++;
+            }
+            $date->addDay();
+        }
+    
+        return $workingDayCount;
+    }
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
 
     
 
