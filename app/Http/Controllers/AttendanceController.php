@@ -156,7 +156,7 @@ class AttendanceController extends Controller
 
     public function deleteattendence(Request $request, $id)
     {
-        $targetDate = Carbon::parse($request->date)->startOfDay();
+        $targetDate = Carbon::day($request->date)->startOfDay();
         
         $attendance = Attendance::whereDate('created_at', $targetDate)
             ->where('day_id', $id)
@@ -172,14 +172,20 @@ class AttendanceController extends Controller
     }
     public function takeattedence()
     {
-      $weekdays = Week_day::get();
-      foreach ($weekdays as  $weekday) {
-        $attendance =new Attendance;
-        $attendance->attedance = 1;
-        $attendance->day_id = $weekday->id;
-        $attendance->save();
-      }  
-      return response()->json(['message' => 'Attendance taken successfully'], 200);
+        $weekdays = Week_day::get();
+        Carbon::setLocale('ar');
+        $today = Carbon::now()->locale('ar');
+    
+        if ($today == $weekdays->day ) {
+
+            foreach ($weekdays as  $weekday) {
+                $attendance =new Attendance;
+                $attendance->attedance = 1;
+                $attendance->day_id = $weekday->id;
+                $attendance->save();
+        }   
+        }
+       return response()->json(['message' => 'Attendance taken successfully'], 200);
 
     }
 
