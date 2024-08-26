@@ -130,23 +130,20 @@ class AttendanceController extends Controller
         $today = Carbon::now()->locale('ar')->isoFormat('dddd');
     
         $query = Attendance::where('day_id', $id);
-        
-        if ($request->created_at && $query->attedance == 0 ) {
-            $query->whereDate('created_at', $request->created_at)
-            ->where('attedance', 0);
-            $existingAttendance = $query->first();
-        }
-        elseif($request->created_at && $query->attedance == 1 )  {
-            $query->whereDate('created_at', $request->created_at)
-            ->where('attedance', 1)->first();
-            $this->deleteattendence($request->created_at,$query->id);
-        }
     
-        
+    if ($request->created_at) {
+        $query->whereDate('created_at', $request->created_at);
+    }
     
-        if ($existingAttendance) {
-            return response()->json(['message' => 'attendance already taken'], 200);
+    $existingAttendance = $query->first();
+
+    if ($existingAttendance) {
+        if ($existingAttendance->attedance == 1) {
+            $existingAttendance->delete();
+        } else {
+            return response()->json(['message' => 'Attendance already taken'], 200);
         }
+    }
     
         $attendance = new Attendance;
         $attendance->day_id = $id;
