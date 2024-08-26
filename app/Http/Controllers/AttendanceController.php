@@ -131,11 +131,18 @@ class AttendanceController extends Controller
     
         $query = Attendance::where('day_id', $id);
         
-        if ($request->created_at) {
-            $query->whereDate('created_at', $request->created_at);
+        if ($request->created_at && $query->attedance == 0 ) {
+            $query->whereDate('created_at', $request->created_at)
+            ->where('attedance', 0);
+            $existingAttendance = $query->first();
+        }
+        elseif($request->created_at && $query->attedance == 1 )  {
+            $query->whereDate('created_at', $request->created_at)
+            ->where('attedance', 1)->first();
+            $this->deleteattendence($request->created_at,$query->id);
         }
     
-        $existingAttendance = $query->first();
+        
     
         if ($existingAttendance) {
             return response()->json(['message' => 'attendance already taken'], 200);
@@ -171,24 +178,22 @@ class AttendanceController extends Controller
         return response()->json(['message' => 'Attendance record deleted successfully'], 200);
     }
     public function takeattedence()
-    {
-        $weekdays = Week_day::get();
-        Carbon::setLocale('ar');
-        $today = Carbon::now()->locale('ar');
-    
-        if ($today == $weekdays->day ) {
+{
+    Carbon::setLocale('ar');
+    $today = Carbon::now()->translatedFormat('l');
+    $weekdays = Week_day::get();
 
-            foreach ($weekdays as  $weekday) {
-                $attendance =new Attendance;
-                $attendance->attedance = 1;
-                $attendance->day_id = $weekday->id;
-                $attendance->save();
-        }   
+    foreach ($weekdays as $weekday) {
+        if ($today == $weekday->day) {
+            $attendance = new Attendance;
+            $attendance->attedance = 1;
+            $attendance->day_id = $weekday->id;
+            $attendance->save();
         }
-       return response()->json(['message' => 'Attendance taken successfully'], 200);
-
     }
 
+    return response()->json(['message' => 'Attendance taken successfully'], 200);
+}
 
 
 
