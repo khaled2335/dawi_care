@@ -252,15 +252,12 @@ class DocterController extends Controller
          
              $results = [];
          
-         
-             
-             
                  $workingDays = Week_day::where('doctor_id', $doctor->id)
                      ->pluck('day')
                      ->toArray();
          
                  $monthlyWorkingDays = $this->countMonthlyWorkingDays($year, $month, $workingDays, $dayMapping);
-         
+               
                  // Update the doctor's num_working_days
                  $doctor->num_working_days = $monthlyWorkingDays;
                  $doctor->save();

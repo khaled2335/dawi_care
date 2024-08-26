@@ -65,3 +65,4 @@ Route::get('get_doctor_attendence/{doctorId}' , [AttendanceController::class,'sh
 Route::get('get_employee_attendence/{employeeId}' , [AttendanceController::class,'showemployee'] );
 Route::post('attendencezero/{id}' , [AttendanceController::class,'attendencezero'] );
 Route::post('deleteattendence/{id}' , [AttendanceController::class,'deleteattendence'] );
+Route::post('takeattedence' , [AttendanceController::class,'takeattedence'] );

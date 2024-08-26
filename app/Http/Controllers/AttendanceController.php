@@ -170,6 +170,28 @@ class AttendanceController extends Controller
         
         return response()->json(['message' => 'Attendance record deleted successfully'], 200);
     }
+    public function takeattedence()
+    {
+      $weekdays = Week_day::get();
+      foreach ($weekdays as  $weekday) {
+        $attendance =new Attendance;
+        $attendance->attedance = 1;
+        $attendance->day_id = $weekday->id;
+        $attendance->save();
+      }  
+      return response()->json(['message' => 'Attendance taken successfully'], 200);
+
+    }
+
+
+
+
+
+
+
+
+
+
 
 
 
