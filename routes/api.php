@@ -49,7 +49,7 @@ Route::get('Show_Employee/{id}' , [employeeController::class,'show'] )->middlewa
 Route::post('Edit_Employee/{id}' , [employeeController::class,'edit'] )->middleware('auth');
 Route::post('Delete_Employee/{id}' , [employeeController::class,'destroy'] )->middleware('auth');
 ################################      worked_days         ##########################################################
-Route::post('Add_Week_day/{id}' , [week_days::class,'create'] )->middleware('auth');
+Route::post('switchday/{id}' , [week_days::class,'switchday'] )->middleware('auth');
 Route::get('All_Week_day' , [week_days::class,'index'] )->middleware('auth');
 Route::get('Show_Week_day/{id}' , [week_days::class,'show'] )->middleware('auth');
 Route::post('Edit_Week_day/{id}' , [week_days::class,'edit'] )->middleware('auth');

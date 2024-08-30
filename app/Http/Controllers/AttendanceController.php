@@ -176,21 +176,41 @@ class AttendanceController extends Controller
     }
     public function takeattedence()
 {
-    Carbon::setLocale('ar');
+   Carbon::setLocale('ar');
     $today = Carbon::now()->translatedFormat('l');
     $weekdays = Week_day::get();
+    $attendanceTaken = false;
 
     foreach ($weekdays as $weekday) {
-        if ($today == $weekday->day && Carbon::now()->toDateString() != $attendance->created_at) {
-            $attendance = new Attendance;
-            $attendance->attedance = 1;
-            $attendance->day_id = $weekday->id;
-            $attendance->save();
+        if ($today == $weekday->day) {
+            
+            $existingAttendance = Attendance::where('day_id', $weekday->id)
+                ->whereDate('created_at', Carbon::today()->toDateString())
+                ->first();
+
+            if (!$existingAttendance) {
+                
+                $attendance = new Attendance;
+                $attendance->attedance = 1;
+                $attendance->day_id = $weekday->id;
+                $attendance->save();
+                $attendanceTaken = true;
+            } else {
+                $attendanceTaken = 'already_taken';
+            }
         }
     }
 
-    return response()->json(['message' => 'Attendance taken successfully'], 200);
+    if ($attendanceTaken === true) {
+        return response()->json(['message' => 'Attendance taken successfully'], 200);
+    } elseif ($attendanceTaken === 'already_taken') {
+        return response()->json(['message' => 'Attendance already taken for today'], 400);
+    } else {
+        return response()->json(['message' => 'No attendance taken'], 404);
+    }
 }
+    
+    
 
 
 
