@@ -86,7 +86,7 @@ class week_days extends Controller
             $attendance->attedance = 1;
             $attendance->created_at = $request->created_at;
             $attendance->save();      
-            return response()->json(['message' => 'days inserted succssfully'], 200);
+            return response()->json(['message' => 'Data inserted successfully']);
 
         }
    

@@ -42,6 +42,7 @@ class AttendanceController extends Controller
             return [
                 'id' => $weekday->id,
                 'day' => $weekday->day,
+                'switch_day' => $weekday->switch_day,
                 'revenue' => $weekday->revenue,
                 'doctor_id' => $weekday->doctor_id,
                 'emplyee_id' => $weekday->emplyee_id,
@@ -81,6 +82,7 @@ class AttendanceController extends Controller
                     'attendance_data' => $group->map(function ($item) {
                         return [
                             'day' => $item->day,
+                            'switch_day' => $item->switch_day,
                             'attendance' => $item->attendance,
                             'date' => $item->attendance_date
                         ];
@@ -112,6 +114,7 @@ class AttendanceController extends Controller
                     'attendance_data' => $group->map(function ($item) {
                         return [
                             'day' => $item->day,
+                            'switch_day' => $item->switch_day,
                             'attendance' => $item->attendance,
                             'date' => $item->attendance_date
                         ];
