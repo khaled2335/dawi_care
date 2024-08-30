@@ -181,7 +181,7 @@ class AttendanceController extends Controller
     $weekdays = Week_day::get();
 
     foreach ($weekdays as $weekday) {
-        if ($today == $weekday->day) {
+        if ($today == $weekday->day && Carbon::now()->toDateString() != $attendance->created_at) {
             $attendance = new Attendance;
             $attendance->attedance = 1;
             $attendance->day_id = $weekday->id;
