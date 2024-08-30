@@ -57,8 +57,14 @@ class week_days extends Controller
                     $weekDay2->doctor_id = $id;
                     $weekDay2->save();
                 }
+                
+                $attendance = new Attendance;
+                $attendance->day_id = $weekDay1->id;
+                $attendance->attedance = 1;
+                $attendance->created_at = $request->created_at;
+                $attendance->save();  
+
          }
-    
              return response()->json(['message' => 'Data inserted successfully']);
         }
         if ($type === 'employee'){
@@ -75,8 +81,15 @@ class week_days extends Controller
                 
     
             }
+            $attendance = new Attendance;
+            $attendance->day_id = $e_weekdays->id;
+            $attendance->attedance = 1;
+            $attendance->created_at = $request->created_at;
+            $attendance->save();      
             return response()->json(['message' => 'days inserted succssfully'], 200);
+
         }
+   
      }
     
 
