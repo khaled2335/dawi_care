@@ -70,6 +70,7 @@ class AttendanceController extends Controller
             ->select(
                 'doctors.name',
                 'week_days.day',
+                'week_days.switch_day',
                 'attendances.attedance as attendance',
                 DB::raw('DATE(attendances.created_at) as attendance_date')
             )
@@ -102,6 +103,7 @@ class AttendanceController extends Controller
             ->select(
                 'employees.name',
                 'week_days.day',
+                'week_days.switch_day',
                 'attendances.attedance as attendance',
                 DB::raw('DATE(attendances.created_at) as attendance_date')
             )
