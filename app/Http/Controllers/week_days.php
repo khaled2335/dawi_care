@@ -35,8 +35,10 @@ class week_days extends Controller
         
          $rawData = $request->input('data');
          $type = $request->input('type');
+         $sday_date = $request->input('sday_date');
     
          $elements = explode(',', $rawData); 
+         
          
          
          if ($type === 'doctor') {
@@ -47,7 +49,9 @@ class week_days extends Controller
                 $weekDay1->switch_day = $elements[$i];
                 $weekDay1->date = $elements[$i + 1];
                 $weekDay1->doctor_id = $id;
+                $weekDay1->sday_date = $sday_date ;
                 $weekDay1->save();
+                //ali branch test
     
                 
                 if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
@@ -55,6 +59,7 @@ class week_days extends Controller
                     $weekDay2->switch_day = $elements[$i + 2];
                     $weekDay2->date = $elements[$i + 3];
                     $weekDay2->doctor_id = $id;
+                    $weekDay2->sday_date  = $sday_date ;
                     $weekDay2->save();
                 }
                 
@@ -77,6 +82,7 @@ class week_days extends Controller
                 $e_weekdays = new Week_day;
                 $e_weekdays->switch_day = $elements[$i];
                 $e_weekdays->emplyee_id = $id;
+                $e_weekdays->sday_date  = $sday_date ;
                 $e_weekdays->save();
                 
     
