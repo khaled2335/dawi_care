@@ -50,13 +50,13 @@ class week_days extends Controller
                 $weekDay1->save();
     
                 
-                if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
-                    $weekDay2 = new Week_day();
-                    $weekDay2->switch_day = $elements[$i + 2];
-                    $weekDay2->date = $elements[$i + 3];
-                    $weekDay2->doctor_id = $id;
-                    $weekDay2->save();
-                }
+                // if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
+                //     $weekDay2 = new Week_day();
+                //     $weekDay2->switch_day = $elements[$i + 2];
+                //     $weekDay2->date = $elements[$i + 3];
+                //     $weekDay2->doctor_id = $id;
+                //     $weekDay2->save();
+                // }
                 
                 $attendance = new Attendance;
                 $attendance->day_id = $weekDay1->id;
