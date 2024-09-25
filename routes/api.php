@@ -7,6 +7,7 @@ use App\Http\Controllers\DocterController;
 use App\Http\Controllers\employeeController;
 use App\Http\Controllers\week_days;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\ClinicController;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,3 +67,10 @@ Route::get('get_employee_attendence/{employeeId}' , [AttendanceController::class
 Route::post('attendencezero/{id}' , [AttendanceController::class,'attendencezero'] );
 Route::post('deleteattendence/{id}' , [AttendanceController::class,'deleteattendence'] );
 Route::post('takeattedence' , [AttendanceController::class,'takeattedence'] );
+
+################################    clinic        ##########################################################
+
+Route::post('add_clinic' , [ClinicController::class,'add_clinic'] );
+Route::get('all_clinic' , [ClinicController::class,'all_clinic'] );
+Route::post('delete_clinic/{id}' , [ClinicController::class,'delete_clinic'] );
+

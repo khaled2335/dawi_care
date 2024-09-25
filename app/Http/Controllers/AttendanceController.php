@@ -165,7 +165,7 @@ class AttendanceController extends Controller
 
     public function deleteattendence(Request $request, $id)
     {
-        $targetDate = Carbon::day($request->date)->startOfDay();
+        $targetDate = Carbon::parse($request->date)->startOfDay();
         
         $attendance = Attendance::whereDate('created_at', $targetDate)
             ->where('day_id', $id)

@@ -49,7 +49,7 @@ class DocterController extends Controller
             $doctor->profile_photo = asset('photos/doctor_photo/' . $doctor_image_name); 
             $doctor->scientific_degree = $request->scientific_degree;
             $doctor->union_registration = asset('photos/union_registration_file/' . $union_registration_file); 
-            $doctor->specialty = $request->specialty;
+            $doctor->clinic_id = $request->clinic;
             $doctor->fixed_salary = $request->fixed_salary;
             $res = $doctor->save();
             if ($res) {
@@ -112,7 +112,9 @@ class DocterController extends Controller
                         'id' => $doctor->id,
                         'num_working_days' => $monthlyWorkingDays
                     ];
-                
+                $doctor->total_fixed = $monthlyWorkingDays*$request->fixed_salary;
+                $doctor->save();
+
                 
             
            
@@ -124,10 +126,7 @@ class DocterController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+       public function show(string $id)
     {
         $doctor = Doctor::find($id);
         if ($doctor) {
