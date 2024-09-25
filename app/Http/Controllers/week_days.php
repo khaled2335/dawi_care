@@ -51,7 +51,7 @@ class week_days extends Controller
                 $weekDay1->doctor_id = $id;
                 $weekDay1->sday_date = $sday_date ;
                 $weekDay1->save();
-                //ali branch test
+                
     
                 
                 if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
@@ -283,7 +283,6 @@ private function countMonthlyWorkingDays($year, $month, $workingDays, $dayMappin
 
     return $workingDayCount;
 }
-
 
 
 
