@@ -8,6 +8,7 @@ use App\Http\Controllers\employeeController;
 use App\Http\Controllers\week_days;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ClinicController;
+use App\Http\Controllers\ServiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,8 +70,14 @@ Route::post('deleteattendence/{id}' , [AttendanceController::class,'deleteattend
 Route::post('takeattedence' , [AttendanceController::class,'takeattedence'] );
 
 ################################    clinic        ##########################################################
-
 Route::post('add_clinic' , [ClinicController::class,'add_clinic'] );
 Route::get('all_clinic' , [ClinicController::class,'all_clinic'] );
 Route::post('delete_clinic/{id}' , [ClinicController::class,'delete_clinic'] );
+Route::post('edit_clinic/{id}' , [ClinicController::class,'edit_clinic'] );
+
+################################    service     ##########################################################
+Route::post('add_service' , [ServiceController::class,'add_service'] );
+Route::get('all_service' , [ServiceController::class,'all_service'] );
+Route::post('delete_service/{id}' , [ServiceController::class,'delete_service'] );
+Route::post('edit_service/{id}' , [ServiceController::class,'edit_service'] );
 
