@@ -15,7 +15,13 @@ class ClinicController extends Controller
 
      $clinics = Clinic::get();
      
-     return response()->json([$clinics]);
+     return response()->json($clinics);
+    }
+    public function show_clinic($id){
+
+     $clinics = Clinic::with('service')->findOrFail($id);
+     
+     return response()->json($clinics);
     }
     public function add_clinic(Request $request){
 
