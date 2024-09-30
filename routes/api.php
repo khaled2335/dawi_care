@@ -72,6 +72,7 @@ Route::post('takeattedence' , [AttendanceController::class,'takeattedence'] );
 ################################    clinic        ##########################################################
 Route::post('add_clinic' , [ClinicController::class,'add_clinic'] );
 Route::get('all_clinic' , [ClinicController::class,'all_clinic'] );
+Route::get('show_clinic/{id}' , [ClinicController::class,'show_clinic'] );
 Route::post('delete_clinic/{id}' , [ClinicController::class,'delete_clinic'] );
 Route::post('edit_clinic/{id}' , [ClinicController::class,'edit_clinic'] );
 
