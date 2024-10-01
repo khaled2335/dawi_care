@@ -94,9 +94,6 @@ class DocterController extends Controller
                 ];
             
                 $results = [];
-            
-            
-                
                 
                     $workingDays = Week_day::where('doctor_id', $doctor->id)
                         ->pluck('day')
@@ -115,10 +112,6 @@ class DocterController extends Controller
                 $doctor->total_fixed = $monthlyWorkingDays*$request->fixed_salary;
                 $doctor->save();
 
-                
-            
-           
-                  
             return response()->json(['message' => 'Doctor added successfully', 'doctor' => $doctor]);
             }     
                 
@@ -200,7 +193,7 @@ class DocterController extends Controller
         $doctor->phone_number = $request->phone_number;
         $doctor->scientific_degree = $request->scientific_degree;
         $doctor->fixed_salary = $request->fixed_salary;
-        $doctor->specialty = $request->specialty;
+        $doctor->clinic_id = $request->clinic;
 
         $res = $doctor->save();
         if ($res) {
