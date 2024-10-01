@@ -13,7 +13,7 @@ class ClinicController extends Controller
 
     public function all_clinic(){
 
-     $clinics = Clinic::get();
+     $clinics = Clinic::with('service')->get();
      
      return response()->json($clinics);
     }
