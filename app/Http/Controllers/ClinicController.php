@@ -86,20 +86,20 @@ class ClinicController extends Controller
            
            for ($i = 0; $i < count($elements); $i += 4) {
          
-               $Service1 = new Service();
-               $Service1->name = $elements[$i];
-               $Service1->price = $elements[$i + 1];
-               $Service1->clinic_id = $clinic->id;
-               $Service1->save();
-    
-               if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
-                   $Service2 = new Service();
-                   $Service2->name = $elements[$i + 2];
-                   $Service2->price = $elements[$i + 3];
-                   $Service2->clinic_id = $clinic->id;
-                   $Service2->save();
-               }
-        }   
+            $Service1 = new Service();
+            $Service1->name = $elements[$i];
+            $Service1->price = $elements[$i + 1];
+            $Service1->clinic_id = $clinic->id;
+            $Service1->save();
+ 
+            if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
+                $Service2 = new Service();
+                $Service2->name = $elements[$i + 2];
+                $Service2->price = $elements[$i + 3];
+                $Service2->clinic_id = $clinic->id;
+                $Service2->save();
+            }
+     }
     
     }
      return response()->json(['message' => 'clinic updated successfully']);
