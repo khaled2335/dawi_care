@@ -30,7 +30,7 @@ class ClinicController extends Controller
      $res = $clinic->save();
      if ($res) {
                 
-        $rawData = $request->input('services');
+        $rawData = $request->input('service');
    
         $elements = explode(',', $rawData); 
         
@@ -71,7 +71,7 @@ class ClinicController extends Controller
      $res = $clinic->save();
      if ($res) {
                 
-        $rawData = $request->input('services');
+        $rawData = $request->input('service');
    
         $elements = explode(',', $rawData); 
         
