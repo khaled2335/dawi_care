@@ -9,6 +9,7 @@ use App\Http\Controllers\week_days;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ClinicController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SalaryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -81,4 +82,9 @@ Route::post('add_service' , [ServiceController::class,'add_service'] );
 Route::get('all_service' , [ServiceController::class,'all_service'] );
 Route::post('delete_service/{id}' , [ServiceController::class,'delete_service'] );
 Route::post('edit_service/{id}' , [ServiceController::class,'edit_service'] );
+################################    salaries     ##########################################################
+Route::post('add_salary/{weekdayid}' , [SalaryController::class,'add_salary'] );
+Route::get('all_salary' , [SalaryController::class,'all_salary'] );
+Route::post('delete_salary/{id}' , [SalaryController::class,'delete_salary'] );
+Route::post('edit_salary/{id}' , [SalaryController::class,'edit_salary'] );
 
