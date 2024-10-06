@@ -47,10 +47,12 @@ class SalaryController extends Controller
 }
  
 public function all_salary(){
-
     $salarys = Salary::get();
     return response()->json($salarys );
-
+}
+public function show_salary($docid){
+    $salary= Salary::where('doctor_id' ,$docid )->get();
+    return response()->json($salary);
 }
 
 

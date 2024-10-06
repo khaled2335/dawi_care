@@ -85,6 +85,7 @@ Route::post('edit_service/{id}' , [ServiceController::class,'edit_service'] );
 ################################    salaries     ##########################################################
 Route::post('add_salary/{dayid}' , [SalaryController::class,'add_salary'] );
 Route::get('all_salary' , [SalaryController::class,'all_salary'] );
+Route::get('show_salary/{docid}' , [SalaryController::class,'show_salary'] );
 Route::post('delete_salary/{id}' , [SalaryController::class,'delete_salary'] );
 Route::post('edit_salary/{id}' , [SalaryController::class,'edit_salary'] );
 
