@@ -35,7 +35,6 @@ class week_days extends Controller
         
          $rawData = $request->input('data');
          $type = $request->input('type');
-         $sday_date = $request->input('sday_date');
     
          $elements = explode(',', $rawData); 
 
@@ -47,7 +46,6 @@ class week_days extends Controller
                 $weekDay1->switch_day = $elements[$i];
                 $weekDay1->date = $elements[$i + 1];
                 $weekDay1->doctor_id = $id;
-                $weekDay1->switch_day = $sday_date ;
                 $weekDay1->save();
                 
     
@@ -57,7 +55,6 @@ class week_days extends Controller
                     $weekDay2->switch_day = $elements[$i + 2];
                     $weekDay2->date = $elements[$i + 3];
                     $weekDay2->doctor_id = $id;
-                    $weekDay2->switch_day  = $sday_date ;
                     $weekDay2->save();
                 }
                 
