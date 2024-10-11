@@ -68,6 +68,7 @@ class AttendanceController extends Controller
             ->join('attendances', 'week_days.id', '=', 'attendances.day_id')
             ->join('doctors', 'week_days.doctor_id', '=', 'doctors.id')
             ->select(
+                'attendances.id',
                 'doctors.name',
                 'week_days.day',
                 'week_days.switch_day',
@@ -82,6 +83,7 @@ class AttendanceController extends Controller
                     'name' => $group[0]->name,
                     'attendance_data' => $group->map(function ($item) {
                         return [
+                            'attendanceId' => $item->id,
                             'day' => $item->day,
                             'switch_day' => $item->switch_day,
                             'attendance' => $item->attendance,
