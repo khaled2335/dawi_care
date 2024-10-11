@@ -28,6 +28,10 @@ class Doctor extends Model
     {
         return $this->hasMany(Week_day::class);
     }
+    public function clinic()
+{
+    return $this->belongsTo(Clinic::class, 'clinic_id');
+}
 
 }
 

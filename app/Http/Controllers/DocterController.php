@@ -20,7 +20,7 @@ class DocterController extends Controller
     {
         $admin = Auth::user();
         if ($admin && $admin->role == 'admin') { 
-            $doctors = Doctor::with('weekDays')->get();   
+            $doctors = Doctor::with('weekDays','clinic')->get();   
             return response()->json($doctors);
         }
         return response()->json(['message' => 'Unauthorized'], 403);

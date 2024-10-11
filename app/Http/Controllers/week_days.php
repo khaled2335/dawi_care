@@ -35,6 +35,11 @@ class week_days extends Controller
         
          $rawData = $request->input('data');
          $type = $request->input('type');
+         $sDayDate = $request->input('sdaydate');
+         if (!$sDayDate) {
+            
+            $sDayDate = Carbon::now()->toDateString();
+        }
     
          $elements = explode(',', $rawData); 
 
@@ -46,6 +51,7 @@ class week_days extends Controller
                 $weekDay1->switch_day = $elements[$i];
                 $weekDay1->date = $elements[$i + 1];
                 $weekDay1->doctor_id = $id;
+                $weekDay1->switched_day_date = $sDayDate;
                 $weekDay1->save();
                 
     
@@ -55,6 +61,7 @@ class week_days extends Controller
                     $weekDay2->switch_day = $elements[$i + 2];
                     $weekDay2->date = $elements[$i + 3];
                     $weekDay2->doctor_id = $id;
+                    $weekDay2->switched_day_date = $sDayDate;
                     $weekDay2->save();
                 }
                 
@@ -77,7 +84,7 @@ class week_days extends Controller
                 $e_weekdays = new Week_day;
                 $e_weekdays->switch_day = $elements[$i];
                 $e_weekdays->emplyee_id = $id;
-                $e_weekdays->switch_day  = $sday_date ;
+                $e_weekdays->switched_day_date = $sDayDate;
                 $e_weekdays->save();
                 
     
