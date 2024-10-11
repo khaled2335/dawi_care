@@ -8,6 +8,7 @@ use App\Models\Clinic;
 use App\Models\Service;
 use App\Models\Attendance;
 use App\Models\Week_day;
+use App\Models\Doctor;
 class SalaryController extends Controller
 {
     public function add_salary(Request $request, $dayid)
@@ -54,6 +55,22 @@ public function show_salary($docid){
     $salary= Salary::where('doctor_id' ,$docid )->get();
     return response()->json($salary);
 }
+public function totalsalaryequation($id)
+{
+    $salary = Salary::findOrFail($id);
+    $doctor = Doctor::findOrFail($salary->doctor_id);
+    $percentage = $doctor->doctor_share / 100;
+    $doctorShares = $salary->total_salary * $percentage;
+    if ($doctor->fixed_salary > $doctorShares) {
+        $doctor->total_salary = $doctor->fixed_salary;
+    } else {
+        $doctor->total_salary = $doctorShares;
+    }
+    $doctor->save();
+
+    return response()->json($doctor);
+}
+
 
 
 
