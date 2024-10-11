@@ -38,9 +38,7 @@ class week_days extends Controller
          $sday_date = $request->input('sday_date');
     
          $elements = explode(',', $rawData); 
-         
-         
-         
+
          if ($type === 'doctor') {
             
             for ($i = 0; $i < count($elements); $i += 4) {
@@ -49,7 +47,7 @@ class week_days extends Controller
                 $weekDay1->switch_day = $elements[$i];
                 $weekDay1->date = $elements[$i + 1];
                 $weekDay1->doctor_id = $id;
-                $weekDay1->sday_date = $sday_date ;
+                $weekDay1->switch_day = $sday_date ;
                 $weekDay1->save();
                 
     
@@ -59,7 +57,7 @@ class week_days extends Controller
                     $weekDay2->switch_day = $elements[$i + 2];
                     $weekDay2->date = $elements[$i + 3];
                     $weekDay2->doctor_id = $id;
-                    $weekDay2->sday_date  = $sday_date ;
+                    $weekDay2->switch_day  = $sday_date ;
                     $weekDay2->save();
                 }
                 
@@ -82,7 +80,7 @@ class week_days extends Controller
                 $e_weekdays = new Week_day;
                 $e_weekdays->switch_day = $elements[$i];
                 $e_weekdays->emplyee_id = $id;
-                $e_weekdays->sday_date  = $sday_date ;
+                $e_weekdays->switch_day  = $sday_date ;
                 $e_weekdays->save();
                 
     
