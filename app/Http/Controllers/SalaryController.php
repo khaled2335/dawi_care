@@ -71,6 +71,20 @@ public function totalsalaryequation($id)
     return response()->json($doctor);
 }
 
+public function getPayed($id,Request $request)
+{
+    $salary = Salary::findOrFail($id);
+    $value = $request->value;
+    if ($salary->is_payed == 1 &&  $value == 1) {
+        return response()->json('sorry.this doctor get payed before');
+    }
+    else {
+        $salary->is_payed = $value;
+        $salary->save();
+        return response()->json('this doctor get payed');
+    }
+}
+
 
 
 

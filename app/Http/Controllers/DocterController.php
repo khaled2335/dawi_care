@@ -110,7 +110,6 @@ class DocterController extends Controller
                         'id' => $doctor->id,
                         'num_working_days' => $monthlyWorkingDays
                     ];
-                $doctor->total_fixed = $monthlyWorkingDays*$request->fixed_salary;
                 $doctor->save();
 
             return response()->json(['message' => 'Doctor added successfully', 'doctor' => $doctor]);
