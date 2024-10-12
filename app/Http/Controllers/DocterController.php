@@ -51,6 +51,7 @@ class DocterController extends Controller
             $doctor->union_registration = asset('photos/union_registration_file/' . $union_registration_file); 
             $doctor->clinic_id = $request->clinic;
             $doctor->fixed_salary = $request->fixed_salary;
+            $doctor->doctor_share = $request->doctor_share;
             $res = $doctor->save();
             if ($res) {
                 
@@ -194,7 +195,7 @@ class DocterController extends Controller
         $doctor->scientific_degree = $request->scientific_degree;
         $doctor->fixed_salary = $request->fixed_salary;
         $doctor->clinic_id = $request->clinic;
-
+        $doctor->doctor_share = $request->doctor_share;
         $res = $doctor->save();
         if ($res) {
             $rawData = $request->input('data');
