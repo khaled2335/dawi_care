@@ -82,6 +82,10 @@ Route::post('add_service' , [ServiceController::class,'add_service'] );
 Route::get('all_service' , [ServiceController::class,'all_service'] );
 Route::post('delete_service/{id}' , [ServiceController::class,'delete_service'] );
 Route::post('edit_service/{id}' , [ServiceController::class,'edit_service'] );
+Route::get('done_service' , [ServiceController::class,'doneService'] );
+Route::post('done_service/{doctorId}/{attendenceId}/{serviceId}' , [ServiceController::class,'doneServicePost'] );
+Route::get('doneServiceDoctor/{doctorId}' , [ServiceController::class,'doneServiceDoctor'] );
+
 ################################    salaries     ##########################################################
 Route::post('add_salary/{dayid}' , [SalaryController::class,'add_salary'] );
 Route::get('all_salary' , [SalaryController::class,'all_salary'] );
