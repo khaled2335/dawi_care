@@ -26,34 +26,24 @@ class ServiceController extends Controller
         $Service = DoneService::get();
         return response()->json(  $Service);
        }
-       public function doneServicePost($doctorId,$attendenceId,$serviceId,Request $request){
+       public function doneServicePost($doctorId,$attendenceId,Request $request){
    
                 $rawData = $request->input('services');
             
                 $elements = explode(',', $rawData); 
                 
-                    if (count($elements) % 2 !== 0) {
-                    return response()->json(['error' => 'Data is not in valid pairs'], 400);
+                    if (count($elements) % 3 !== 0) {
+                    return response()->json(['error' => 'Data is not in valid trios'], 400);
                    }
                    
-                   for ($i = 0; $i < count($elements); $i += 4) {
+                   for ($i = 0; $i < count($elements); $i += 3) {
                         $doneService = new DoneService();
-                        $doneService->service_id = $serviceId;
-                        $doneService->count = $elements[$i];
-                        $doneService->total_cost = $elements[$i+1];  
+                        $doneService->service_id = $elements[$i] ;
+                        $doneService->count = $elements[$i+1];
+                        $doneService->total_cost = $elements[$i+2];  
                         $doneService->doctor_id = $doctorId;  
                         $doneService->attendence_id = $attendenceId;  
                         $doneService->save();
-
-                        if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
-                            $doneService = new DoneService();
-                            $doneService->service_id = $serviceId;
-                            $doneService->count = $elements[$i+2];
-                            $doneService->total_cost = $elements[$i+3];  
-                            $doneService->doctor_id = $doctorId;  
-                            $doneService->attendence_id = $attendenceId;  
-                            $doneService->save();
-                        }
                 }
         return response()->json(['success' => 'serves done added successfully'], 400);
        }

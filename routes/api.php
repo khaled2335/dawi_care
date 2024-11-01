@@ -83,7 +83,7 @@ Route::get('all_service' , [ServiceController::class,'all_service'] );
 Route::post('delete_service/{id}' , [ServiceController::class,'delete_service'] );
 Route::post('edit_service/{id}' , [ServiceController::class,'edit_service'] );
 Route::get('done_service' , [ServiceController::class,'doneService'] );
-Route::post('done_service/{doctorId}/{attendenceId}/{serviceId}' , [ServiceController::class,'doneServicePost'] );
+Route::post('done_service/{doctorId}/{attendenceId}' , [ServiceController::class,'doneServicePost'] );
 Route::get('doneServiceDoctor/{doctorId}' , [ServiceController::class,'doneServiceDoctor'] );
 
 ################################    salaries     ##########################################################
