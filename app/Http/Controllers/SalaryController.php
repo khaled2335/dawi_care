@@ -62,13 +62,14 @@ public function totalsalaryequation($id)
     $percentage = $doctor->doctor_share / 100;
     $doctorShares = $salary->total_salary * $percentage;
     if ($doctor->fixed_salary > $doctorShares) {
-        $doctor->total_salary = $doctor->fixed_salary;
+        $salary->doctor_salary = $doctor->fixed_salary;
     } else {
-        $doctor->total_salary = $doctorShares;
+        $salary->doctor_salary  = $doctorShares;
     }
-    $doctor->save();
+    $salary->clinic_salary  = $salary->total_salary - $salary->doctor_salary ;
+    $salary->save();
 
-    return response()->json($doctor);
+    return response()->json($salary);
 }
 
 public function getPayed($id,Request $request)
