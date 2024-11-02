@@ -88,6 +88,7 @@ Route::get('doneServiceDoctor/{doctorId}' , [ServiceController::class,'doneServi
 
 ################################    salaries     ##########################################################
 Route::post('add_salary/{dayid}' , [SalaryController::class,'add_salary'] );
+Route::post('add_salary_employee/{employeeId}' , [SalaryController::class,'add_salaryEmployee'] );
 Route::get('all_salary' , [SalaryController::class,'all_salary'] );
 Route::get('show_salary/{docid}' , [SalaryController::class,'show_salary'] );
 Route::post('delete_salary/{id}' , [SalaryController::class,'delete_salary'] );

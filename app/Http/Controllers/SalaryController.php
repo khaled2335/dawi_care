@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Employee;
 use App\Models\Salary;
 use Illuminate\Http\Request;
 use App\Models\Clinic;
@@ -47,6 +48,18 @@ class SalaryController extends Controller
     return response()->json(['salary' => $salary, 'day' => $day, 'total_attendance' => $countDays]);
 }
  
+public function add_salaryEmployee(Request $request, $employeeId){
+        $fixedsalary = Employee::findOrFail($employeeId);
+        $salary = new Salary();
+        $salary->employee_id = $employeeId;
+        $salary->total_salary =$request->salary ?? $fixedsalary->fixed_salary;	
+        $salary->num_worked_days = $request->num_worked_days ?? 30 ;
+        $salary->is_payed = $request->is_payed ?? 1;
+        $salary->month = date('m');
+        $salary->year = date('Y');
+        $salary->save();
+        return response()->json(['salary' => $salary]);
+}
 public function all_salary(){
     $salarys = Salary::get();
     return response()->json($salarys );
