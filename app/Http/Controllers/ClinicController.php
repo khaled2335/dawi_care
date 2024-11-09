@@ -106,13 +106,4 @@ class ClinicController extends Controller
 
     }
 
-
-
-
-
-
-
-
 }
-
-

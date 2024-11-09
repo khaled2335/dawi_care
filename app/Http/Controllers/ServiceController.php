@@ -45,7 +45,7 @@ class ServiceController extends Controller
                         $doneService->attendence_id = $attendenceId;  
                         $doneService->save();
                 }
-        return response()->json(['success' => 'serves done added successfully'], 400);
+        return response()->json(['success' => 'serves done added successfully'], 200);
        }
 
        public function doneServiceDoctor($doctorId){
