@@ -49,11 +49,17 @@ class SalaryController extends Controller
 }
  
 public function add_salaryEmployee(Request $request, $employeeId){
-        $fixedsalary = Employee::findOrFail($employeeId);
+        $dayIds = Week_day::where('emplyee_id',$employeeId)->pluck('id');
+        $employee = Employee::findOrFail($employeeId);
+        $fixedsalary = $employee->fixed_salary;
+        $absenteeismCount = Attendance::whereIn('day_id', $dayIds)->where('attedance',0)->get()->count();
+        $attendanceCount = Attendance::whereIn('day_id', $dayIds)->where('attedance',1)->get()->count();
+        $deduction = $request->deduction; //per day
         $salary = new Salary();
         $salary->employee_id = $employeeId;
-        $salary->total_salary =$request->salary ?? $fixedsalary->fixed_salary;	
-        $salary->num_worked_days = $request->num_worked_days ?? 30 ;
+        if($attendanceCount>0)
+        $salary->total_salary =  $fixedsalary - ($deduction * $absenteeismCount);
+        $salary->num_worked_days = $attendanceCount ;
         $salary->is_payed = $request->is_payed ?? 1;
         $salary->month = date('m');
         $salary->year = date('Y');
