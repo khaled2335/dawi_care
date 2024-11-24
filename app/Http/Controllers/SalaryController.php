@@ -70,8 +70,14 @@ public function all_salary(){
     $salarys = Salary::get();
     return response()->json($salarys );
 }
-public function show_salary($docid){
-    $salary= Salary::where('doctor_id' ,$docid )->get();
+public function show_salary($id,Request $request){
+
+    if ($request->type == 'doctor') {
+       $salary= Salary::where('doctor_id' ,$id )->get();
+    }
+    else{
+    $salary= Salary::where('employee_id' ,$id )->get();
+    }
     return response()->json($salary);
 }
 public function totalsalaryequation($id)

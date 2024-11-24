@@ -14,4 +14,8 @@ class DoneService extends Model
         'total_cost'
 
     ];
+    public function clinic()
+    {
+        return $this->belongsTo(Clinic::class,'clinic_id');
+    }
 }

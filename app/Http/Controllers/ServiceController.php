@@ -23,7 +23,7 @@ class ServiceController extends Controller
        }
        public function doneService(){
    
-        $Service = DoneService::get();
+        $Service = DoneService::with('clinic')->get();
         return response()->json(  $Service);
        }
        public function doneServicePost($doctorId,$attendenceId,Request $request){
@@ -37,11 +37,14 @@ class ServiceController extends Controller
                    }
                    
                    for ($i = 0; $i < count($elements); $i += 3) {
+                        $serviceId = $elements[$i];                   
+                        $service = Service::find($serviceId);
                         $doneService = new DoneService();
                         $doneService->service_id = $elements[$i] ;
                         $doneService->count = $elements[$i+1];
                         $doneService->total_cost = $elements[$i+2];  
                         $doneService->doctor_id = $doctorId;  
+                        $doneService->clinic_id = $service->clinic_id;  
                         $doneService->attendence_id = $attendenceId;  
                         $doneService->save();
                 }
@@ -52,6 +55,11 @@ class ServiceController extends Controller
    
         $docServices = DoneService::where('doctor_id',$doctorId)->get();
         return response()->json(  $docServices);
+       }
+       public function doneServiceClinic($clinicId){
+   
+        $clinicServices = DoneService::where('clinic_id',$clinicId)->get();
+        return response()->json(  $clinicServices);
        }
 
 }
