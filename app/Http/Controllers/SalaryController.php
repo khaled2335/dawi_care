@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\Salary;
+use App\Models\deduction;
 use Illuminate\Http\Request;
 use App\Models\Clinic;
 use App\Models\Service;
@@ -55,15 +56,37 @@ public function add_salaryEmployee(Request $request, $employeeId){
         $absenteeismCount = Attendance::whereIn('day_id', $dayIds)->where('attedance',0)->get()->count();
         $attendanceCount = Attendance::whereIn('day_id', $dayIds)->where('attedance',1)->get()->count();
         $deduction = $request->deduction; //per day
+        $salary = Salary::where('employee_id', $employeeId)
+        ->where('month', date('m'))
+        ->where('year', date('Y'))
+        ->first();
+        //customDeduction
+        if($request->customdeduction && $salary){
+        $customDeduction  = new deduction();
+        $customDeduction->deduction = $request->customdeduction;
+        $customDeduction->description = $request->description;
+        $customDeduction->salary_id = $salary->id;
+        if ($request->created_at) {
+            $customDeduction->created_at = $request->created_at;
+        }
+        $customDeduction->save();
+        $salary->total_salary -= $customDeduction->deduction;
+        $salary->save();
+        }
+        
+        if (!$salary) {
         $salary = new Salary();
         $salary->employee_id = $employeeId;
         if($attendanceCount>0)
         $salary->total_salary =  $fixedsalary - ($deduction * $absenteeismCount);
-        $salary->num_worked_days = $attendanceCount ;
+        else
+        $salary->total_salary =  $fixedsalary;
+        $salary->num_worked_days = $attendanceCount;
         $salary->is_payed = $request->is_payed ?? 1;
         $salary->month = date('m');
         $salary->year = date('Y');
         $salary->save();
+    }
         return response()->json(['salary' => $salary]);
 }
 public function all_salary(){
@@ -111,7 +134,11 @@ public function getPayed($id,Request $request)
     }
 }
 
-
+public function show_deduction($salaryid)
+{
+        $deduction  = deduction::where('salary_id' ,$salaryid )->get();
+        return response()->json($deduction);
+}
 
 
 

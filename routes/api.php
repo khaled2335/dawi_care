@@ -96,4 +96,6 @@ Route::post('delete_salary/{id}' , [SalaryController::class,'delete_salary'] );
 Route::post('edit_salary/{id}' , [SalaryController::class,'edit_salary'] );
 Route::post('totalsalaryequation/{id}' , [SalaryController::class,'totalsalaryequation']);
 Route::post('getPayed/{id}' , [SalaryController::class,'getPayed']);
+Route::get('show_deduction/{salaryid}' , [SalaryController::class,'show_deduction'] );
+
 
