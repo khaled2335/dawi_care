@@ -75,7 +75,7 @@ public function add_salaryEmployee(Request $request, $employeeId){
         $salary->save();
         }
         
-        if (!$salary) {
+        if ($deduction) {
         $salary = new Salary();
         $salary->employee_id = $employeeId;
         if($attendanceCount>0)
