@@ -46,6 +46,7 @@ class SalaryController extends Controller
         $salary->year = date('Y');
         $salary->save();
     }
+    $this->totalsalaryequation($salary->id);
     return response()->json(['salary' => $salary, 'day' => $day, 'total_attendance' => $countDays]);
 }
  
