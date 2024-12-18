@@ -75,7 +75,7 @@ public function add_salaryEmployee(Request $request, $employeeId){
         $salary->save();
         }
         
-        if ($deduction) {
+        if ($deduction && $salary->is_payed == 0) {
         $salary = new Salary();
         $salary->employee_id = $employeeId;
         if($attendanceCount>0)
@@ -87,7 +87,10 @@ public function add_salaryEmployee(Request $request, $employeeId){
         $salary->month = date('m');
         $salary->year = date('Y');
         $salary->save();
-    }
+        }
+        elseif ($salary->is_payed == 1) {
+            return response()->json('the salary has been paid before');
+        }
         return response()->json(['salary' => $salary]);
 }
 public function all_salary(){
