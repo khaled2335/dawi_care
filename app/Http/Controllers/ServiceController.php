@@ -62,4 +62,15 @@ class ServiceController extends Controller
         return response()->json(  $clinicServices);
        }
 
+       public function edit_service ($id,$clinicId,Request $request){
+
+            $service = Service::find($id);
+            $service->name = $request->name;
+            $service->price = $request->price;
+            $service->clinic_id = $clinicId;
+            $service->save();
+            return response()->json( ['status'=>'success','data'=> $service],200);
+
+       }
+
 }

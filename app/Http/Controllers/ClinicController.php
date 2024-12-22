@@ -74,12 +74,7 @@ class ClinicController extends Controller
         $rawData = $request->input('service');
    
         $elements = explode(',', $rawData); 
-        
-            $clinic_id = Service::where('clinic_id', $clinic->id)->get();
-            foreach ($clinic_id as $key => $clinic) {
-                $clinic->delete();
-            }
-            
+                    
             if (count($elements) % 2 !== 0) {
             return response()->json(['error' => 'Data is not in valid pairs'], 400);
            }
