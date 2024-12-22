@@ -11,6 +11,8 @@ use App\Models\Service;
 use App\Models\Attendance;
 use App\Models\Week_day;
 use App\Models\Doctor;
+use Carbon\Carbon;
+
 class SalaryController extends Controller
 {
     public function add_salary(Request $request, $dayid)
@@ -49,50 +51,113 @@ class SalaryController extends Controller
     $this->totalsalaryequation($salary->id);
     return response()->json(['salary' => $salary, 'day' => $day, 'total_attendance' => $countDays]);
 }
+
+
+
  
-public function add_salaryEmployee(Request $request, $employeeId){
-        $dayIds = Week_day::where('emplyee_id',$employeeId)->pluck('id');
-        $employee = Employee::findOrFail($employeeId);
-        $fixedsalary = $employee->fixed_salary;
-        $absenteeismCount = Attendance::whereIn('day_id', $dayIds)->where('attedance',0)->get()->count();
-        $attendanceCount = Attendance::whereIn('day_id', $dayIds)->where('attedance',1)->get()->count();
-        $deduction = $request->deduction; //per day
-        $salary = Salary::where('employee_id', $employeeId)
-        ->where('month', date('m'))
-        ->where('year', date('Y'))
-        ->first();
-        //customDeduction
-        if($request->customdeduction && $salary){
-        $customDeduction  = new deduction();
-        $customDeduction->deduction = $request->customdeduction;
-        $customDeduction->description = $request->description;
-        $customDeduction->salary_id = $salary->id;
-        if ($request->created_at) {
-            $customDeduction->created_at = $request->created_at;
-        }
-        $customDeduction->save();
-        $salary->total_salary -= $customDeduction->deduction;
-        $salary->save();
-        }
+// public function add_salaryEmployee(Request $request, $employeeId){
+//         $dayIds = Week_day::where('emplyee_id',$employeeId)->pluck('id');
+//         $employee = Employee::findOrFail($employeeId);
+//         $fixedsalary = $employee->fixed_salary;
+//         $absenteeismCount = Attendance::whereIn('day_id', $dayIds)->where('attedance',0)->get()->count();
+//         $attendanceCount = Attendance::whereIn('day_id', $dayIds)->where('attedance',1)->get()->count();
+//         $deduction = $request->deduction; //per day
+//         $salary = Salary::where('employee_id', $employeeId)
+//         ->where('month', date('m'))
+//         ->where('year', date('Y'))
+//         ->first();
+//         //customDeduction
+//         if($request->customdeduction && $salary){
+//         $customDeduction  = new deduction();
+//         $customDeduction->deduction = $request->customdeduction;
+//         $customDeduction->description = $request->description;
+//         $customDeduction->salary_id = $salary->id;
+//         if ($request->created_at) {
+//             $customDeduction->created_at = $request->created_at;
+//         }
+//         $customDeduction->save();
+//         $salary->total_salary -= $customDeduction->deduction;
+//         $salary->save();
+//         }
         
-        if ($deduction && $salary->is_payed == 0) {
+//         if ($deduction && $salary->is_payed == 0) {
+//         $salary = new Salary();
+//         $salary->employee_id = $employeeId;
+//         if($attendanceCount>0)
+//         $salary->total_salary =  $fixedsalary - ($deduction * $absenteeismCount);
+//         else
+//         $salary->total_salary =  $fixedsalary;
+//         $salary->num_worked_days = $attendanceCount;
+//         $salary->is_payed = $request->is_payed ?? 1;
+//         $salary->month = date('m');
+//         $salary->year = date('Y');
+//         $salary->save();
+//         }
+//         elseif ($salary->is_payed == 1) {
+//             return response()->json('the salary has been paid before');
+//         }
+//         return response()->json(['salary' => $salary]);
+// }
+
+public function add_salaryEmployee(Request $request, $employeeId){
+    $dayIds = Week_day::where('emplyee_id',$employeeId)->pluck('id');
+    $employee = Employee::findOrFail($employeeId);
+    $fixedsalary = $employee->fixed_salary;
+    $absenteeismCount = Attendance::whereIn('day_id', $dayIds)->where('attedance',0)->get()->count();
+    $attendanceCount = Attendance::whereIn('day_id', $dayIds)->where('attedance',1)->get()->count();
+    $deduction = $request->deduction; //per day
+    $salary = Salary::where('employee_id', $employeeId)
+    ->where('month', date('m'))
+    ->where('year', date('Y'))
+    ->first();
+
+    //customDeduction
+    if($request->customdeduction && $salary){
+        // Get the month and year from created_at if provided, otherwise use current date
+        $deductionDate = $request->created_at ? Carbon::parse($request->created_at) : Carbon::now();
+        
+        // Find the salary record for the month of the deduction
+        $targetSalary = Salary::where('employee_id', $employeeId)
+            ->where('month', $deductionDate->format('m'))
+            ->where('year', $deductionDate->format('Y'))
+            ->first();
+        
+        if($targetSalary) {
+            $customDeduction  = new deduction();
+            $customDeduction->deduction = $request->customdeduction;
+            $customDeduction->description = $request->description;
+            $customDeduction->salary_id = $targetSalary->id;
+            if ($request->created_at) {
+                $customDeduction->created_at = $request->created_at;
+            }
+            $customDeduction->save();
+            
+            $targetSalary->total_salary -= $customDeduction->deduction;
+            $targetSalary->save();
+        }
+    }
+    
+    if ($deduction && $salary->is_payed == 0) {
         $salary = new Salary();
         $salary->employee_id = $employeeId;
         if($attendanceCount>0)
-        $salary->total_salary =  $fixedsalary - ($deduction * $absenteeismCount);
+            $salary->total_salary =  $fixedsalary - ($deduction * $absenteeismCount);
         else
-        $salary->total_salary =  $fixedsalary;
+            $salary->total_salary =  $fixedsalary;
         $salary->num_worked_days = $attendanceCount;
         $salary->is_payed = $request->is_payed ?? 1;
         $salary->month = date('m');
         $salary->year = date('Y');
         $salary->save();
-        }
-        elseif ($salary->is_payed == 1) {
-            return response()->json('the salary has been paid before');
-        }
-        return response()->json(['salary' => $salary]);
+    }
+    elseif ($salary->is_payed == 1) {
+        return response()->json('the salary has been paid before');
+    }
+    return response()->json(['salary' => $salary]);
 }
+
+
+
 public function all_salary(){
     $salarys = Salary::get();
     return response()->json($salarys );
