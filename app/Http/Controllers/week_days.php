@@ -101,26 +101,14 @@ class week_days extends Controller
 
     public function switchday(Request $request, $id)
     {
-        $rawData = $request->input('data');
+        $day = $request->input('day');
         $type = $request->input('type');
-        $sDayDate = $request->input('sDayDate');
-
-        if (!$sDayDate) {
-            return response()->json(['error' => 'Switched day date is required'], 400);
-        }
-
-        try {
-            $sDayDate = Carbon::parse($sDayDate)->toDateString();
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Invalid date format'], 400);
-        }
-
-        $elements = explode(',', $rawData);
-
+        $switchedDayDate = $request->input('switchedDayDate');
+        $switchDayDate = $request->input('switchDayDate');
+        $date = $request->input('date');
         if ($type === 'doctor') {
-            // Check if the doctor has already switched this day
             $existingSwitch = Week_day::where('doctor_id', $id)
-                ->where('switched_day_date', $sDayDate)
+                ->where('switched_day_date', $switchedDayDate)
                 ->first();
 
             if ($existingSwitch) {
@@ -132,55 +120,44 @@ class week_days extends Controller
                     ]
                 ], 400);
             }
+                $weekDay= new Week_day();
+                $weekDay->switch_day = $day;
+                $weekDay->date = $date;
+                $weekDay->doctor_id = $id;
+                $weekDay->switched_day_date = $switchedDayDate;
+                $weekDay->switch_day_date = $switchDayDate;
+                $weekDay->save();
+            return response()->json(['message' => 'Data inserted successfully']);
+        }
+        if ($type === 'employee') {
+            $existingSwitch = Week_day::where('emplyee_id', $id)
+                ->where('switched_day_date', $switchedDayDate)
+                ->first();
 
-            // If no existing switch found, proceed with creating new switch
-            for ($i = 0; $i < count($elements); $i += 4) {
-                $weekDay1 = new Week_day();
-                $weekDay1->switch_day = $elements[$i];
-                $weekDay1->date = $elements[$i + 1];
-                $weekDay1->doctor_id = $id;
-                $weekDay1->switched_day_date = $sDayDate;
-                $weekDay1->save();
-
-                if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
-                    $weekDay2 = new Week_day();
-                    $weekDay2->switch_day = $elements[$i + 2];
-                    $weekDay2->date = $elements[$i + 3];
-                    $weekDay2->doctor_id = $id;
-                    $weekDay2->switched_day_date = $sDayDate;
-                    $weekDay2->save();
-                }
-
-                $attendance = new Attendance;
-                $attendance->day_id = $weekDay1->id;
-                $attendance->attedance = 1;
-                $attendance->created_at = $request->created_at;
-                $attendance->save();
+            if ($existingSwitch) {
+                return response()->json([
+                    'error' => 'This day has already been submitted for switching',
+                    'existing_switch' => [
+                        'switch_day' => $existingSwitch->switch_day,
+                        'switched_date' => $existingSwitch->switched_day_date
+                    ]
+                ], 400);
             }
+                $weekDay= new Week_day();
+                $weekDay->switch_day = $day;
+                $weekDay->date = $date;
+                $weekDay->emplyee_id = $id;
+                $weekDay->switched_day_date = $switchedDayDate;
+                $weekDay->switch_day_date = $switchDayDate;
+                $weekDay->save();
             return response()->json(['message' => 'Data inserted successfully']);
         }
 
-        // ... rest of your employee code remains the same ...
     }
 
 
 
-    //  public function edit(Request $request, $id)
-    //  {
-    //     $admin = Auth::user();
-    //     if ($admin && $admin->role == 'admin') {
-    //     $weekday = Week_day::find($id);
-    //     if ($weekday) {
-    //         $weekday->day = $request->day; 
-    //         $weekday->date = $request->date; 
-    //         $weekday->save();
-    //         return response()->json(['massege'=>'weekday updated successfully']);
-    //     }
-    //     return response()->json([ 'message' => 'weekday not found (id is wrong)']);
-    // }
-    //    return response()->json(['message' => 'Unauthorized'], 403); 
-
-    //  }
+    
     public function editall(Request $request, $id)
     {
         $admin = Auth::user();
