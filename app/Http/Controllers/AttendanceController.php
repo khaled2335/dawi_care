@@ -21,9 +21,9 @@ class AttendanceController extends Controller
     // {
     //     Carbon::setLocale('ar'); 
     //     $today = Carbon::now()->locale('ar')->isoFormat('dddd');//الاحد
-     
+
     //     $weekdays = Week_day::where('day', $today)->get();//107
-        
+
     //     foreach ($weekdays as $weekday) {
     //         $attendance = new Attendance;
     //         $attendance->day_id = $weekday->id;
@@ -35,8 +35,8 @@ class AttendanceController extends Controller
 
     public function index()
     {
-        
-        $weekdays = Week_day::with(['attendanceofweekday', 'doctor','employee'])->get();
+
+        $weekdays = Week_day::with(['attendanceofweekday', 'doctor', 'employee'])->get();
 
         $result = $weekdays->map(function ($weekday) {
             return [
@@ -61,7 +61,7 @@ class AttendanceController extends Controller
 
         return response()->json($result);
     }
-      
+
     public function show($doctorId)
     {
         $result = DB::table('week_days')
@@ -94,7 +94,7 @@ class AttendanceController extends Controller
             })
             ->values()
             ->first();
-    
+
         return response()->json($result);
     }
     public function showemployee($employeeId)
@@ -127,7 +127,7 @@ class AttendanceController extends Controller
             })
             ->values()
             ->first();
-    
+
         return response()->json($result);
     }
 
@@ -135,109 +135,88 @@ class AttendanceController extends Controller
     {
         Carbon::setLocale('ar');
         $today = Carbon::now()->locale('ar')->isoFormat('dddd');
-    
-        $query = Attendance::where('day_id', $id);
-    
-    if ($request->created_at) {
-        $query->whereDate('created_at', $request->created_at);
-    }
-    
-    $existingAttendance = $query->first();
 
-    if ($existingAttendance) {
-        if ($existingAttendance->attedance == 1) {
-            $existingAttendance->delete();
-        } else {
-            return response()->json(['message' => 'Attendance already taken'], 200);
+        $query = Attendance::where('day_id', $id);
+
+        if ($request->created_at) {
+            $query->whereDate('created_at', $request->created_at);
         }
-    }
-    
+
+        $existingAttendance = $query->first();
+
+        if ($existingAttendance) {
+            if ($existingAttendance->attedance == 1) {
+                $existingAttendance->delete();
+            } else {
+                return response()->json(['message' => 'Attendance already taken'], 200);
+            }
+        }
+
         $attendance = new Attendance;
         $attendance->day_id = $id;
         $attendance->attedance = 0;
-        
+
         if ($request->created_at) {
             $attendance->created_at = $request->created_at;
         }
-        
+
         $attendance->save();
-    
+
         return response()->json(['message' => 'take attendance'], 200);
     }
 
     public function deleteattendence(Request $request, $id)
     {
         $targetDate = Carbon::parse($request->date)->startOfDay();
-        
+
         $attendance = Attendance::whereDate('created_at', $targetDate)
             ->where('day_id', $id)
             ->first();
-        
+
         if (!$attendance) {
             return response()->json(['message' => 'No attendance record found for the given date and ID'], 404);
         }
-        
+
         $attendance->delete();
-        
+
         return response()->json(['message' => 'Attendance record deleted successfully'], 200);
     }
     public function takeattedence()
-{
-   Carbon::setLocale('ar');
-    $today = Carbon::now()->translatedFormat('l');
-    $weekdays = Week_day::get();
-    $attendanceTaken = false;
+    {
+        // Set locale and timezone correctly
+        Carbon::setLocale('ar');
+        date_default_timezone_set('Africa/Cairo'); // Set PHP default timezone
+        $today = now()->translatedFormat('l'); // now() will use the set timezone
+        $weekdays = Week_day::get();
+        $attendanceTaken = false;
 
-    foreach ($weekdays as $weekday) {
-        if ($today == $weekday->day) {
-            
-            $existingAttendance = Attendance::where('day_id', $weekday->id)
-                ->whereDate('created_at', Carbon::today()->toDateString())
-                ->first();
+        foreach ($weekdays as $weekday) {
+            if ($today == $weekday->day) {
+                // Use now() which will use the Cairo timezone
+                $existingAttendance = Attendance::where('day_id', $weekday->id)
+                    ->whereDate('created_at', now()->toDateString())
+                    ->first();
 
-            if (!$existingAttendance) {
-                
-                $attendance = new Attendance;
-                $attendance->attedance = 1;
-                $attendance->day_id = $weekday->id;
-                $attendance->save();
-                $attendanceTaken = true;
-            } else {
-                $attendanceTaken = 'already_taken';
+                if (!$existingAttendance) {
+                    $attendance = new Attendance;
+                    $attendance->attedance = 1;
+                    $attendance->day_id = $weekday->id;
+                    // Store timestamp in Cairo timezone
+                    $attendance->created_at = now();
+                    $attendance->save();
+                    $attendanceTaken = true;
+                } else {
+                    $attendanceTaken = 'already_taken';
+                }
             }
         }
+
+        if ($attendanceTaken === true) {
+            return response()->json(['message' => 'Attendance taken successfully'], 200);
+        } elseif ($attendanceTaken === 'already_taken') {
+            return response()->json(['message' => 'Attendance already taken for today'], 400);
+        } else {
+            return response()->json(['message' => 'No attendance taken'], 404);
+        }
     }
-
-    if ($attendanceTaken === true) {
-        return response()->json(['message' => 'Attendance taken successfully'], 200);
-    } elseif ($attendanceTaken === 'already_taken') {
-        return response()->json(['message' => 'Attendance already taken for today'], 400);
-    } else {
-        return response()->json(['message' => 'No attendance taken'], 404);
-    }
-}
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
