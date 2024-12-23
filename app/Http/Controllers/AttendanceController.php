@@ -183,16 +183,16 @@ class AttendanceController extends Controller
     }
     public function takeattedence()
     {
-        // Set locale and timezone correctly
         Carbon::setLocale('ar');
-        date_default_timezone_set('Africa/Cairo'); // Set PHP default timezone
-        $today = now()->translatedFormat('l'); // now() will use the set timezone
-        $weekdays = Week_day::get();
+        date_default_timezone_set('Africa/Cairo'); 
+        $today = now()->translatedFormat('l');
+        $weekdays = Week_day::whereDate('created_at', now()->toDateString())
+        ->orWhereDate('switch_day_date', now()->toDateString())
+        ->get();;
         $attendanceTaken = false;
 
         foreach ($weekdays as $weekday) {
             if ($today == $weekday->day) {
-                // Use now() which will use the Cairo timezone
                 $existingAttendance = Attendance::where('day_id', $weekday->id)
                     ->whereDate('created_at', now()->toDateString())
                     ->first();
@@ -201,7 +201,6 @@ class AttendanceController extends Controller
                     $attendance = new Attendance;
                     $attendance->attedance = 1;
                     $attendance->day_id = $weekday->id;
-                    // Store timestamp in Cairo timezone
                     $attendance->created_at = now();
                     $attendance->save();
                     $attendanceTaken = true;
