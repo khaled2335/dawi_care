@@ -178,25 +178,69 @@ class employeeController extends Controller
              if ($res) {
                 $rawData = $request->input('data');
                 $elements = explode(',', $rawData); 
-                $employeeweekdays = Week_day::where('emplyee_id', $employee->id)->get();
-                foreach ($employeeweekdays as $key => $employeeweekday) {
-                    $employeeweekday->delete();
+                $elementsPerRecord = 2; // [id, day] or [day]
+
+                $employeeWeekdays = Week_day::where('emplyee_id', $employee->id)->get();
+                $existingIds = $employeeWeekdays->pluck('id')->toArray();
+
+                $index = 0;
+                while ($index < count($elements)) {
+                    if (is_numeric($elements[$index])) {
+                        $id = $elements[$index];
+                        $day = $elements[$index + 1] ?? null;
+
+                        if (in_array($id, $existingIds)) {
+                            $weekDay = Week_day::find($id);
+                            if ($weekDay) {
+                                $weekDay->day = $day;
+                                $weekDay->save();
+                            }
+                        }
+
+                        $index += $elementsPerRecord;
+                    } else {
+                        $day = $elements[$index];
+
+                        $newWeekDay = new Week_day();
+                        $newWeekDay->day = $day;
+                        $newWeekDay->emplyee_id = $employee->id;
+                        $newWeekDay->save();
+
+                        $index += 1;
+                    }
                 }
-              
-                if (count($elements) == 0) {
-                             return response()->json(['error' => 'days empty'], 400);
-                         }
-                       
-                         for ($i=0 ; $i < count($elements); $i++) { 
-                                
-                               $e_weekdays = new Week_day;
-                               $e_weekdays->day = $elements[$i];
-                               $e_weekdays->emplyee_id = $employee->id;
-                               $e_weekdays->save();
-                                
-                    
-                          }
-                          $now = now();
+
+                // if (count($elements) % 2 !== 0) {
+                //     return response()->json(['error' => 'Data is not in valid pairs'], 400);
+                // }
+
+                // $elementsPerRecord = 2; //[id, day]
+                // $totalRecords = count($elements) / $elementsPerRecord;
+
+                // $employeeWeekdays = Week_day::where('emplyee_id', $employee->id)->get();
+                // $existingCount = $employeeWeekdays->count();
+
+                // foreach ($employeeWeekdays as $index => $weekDay) {
+                //     $elementIndex = $index * $elementsPerRecord;
+
+                //     if ($elementIndex + 1 < count($elements)) {
+                //         $weekDay->day = $elements[$elementIndex + 1];
+                //         $weekDay->save();
+                //     }
+                // }
+
+                // if ($existingCount < $totalRecords) {
+                //     for ($i = $existingCount * $elementsPerRecord; $i < count($elements); $i += $elementsPerRecord) {
+                //         if ($i + 1 < count($elements)) {
+                //             $newWeekDay = new Week_day();
+                //             $newWeekDay->day = $elements[$i + 1];
+                //             $newWeekDay->emplyee_id = $employee->id;
+                //             $newWeekDay->save();
+                //         }
+                //     }
+                // }
+
+            $now = now();
             $year = $request->input('year', $now->year);
             $month = $request->input('month', $now->month);
 

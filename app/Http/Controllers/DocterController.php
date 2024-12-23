@@ -199,35 +199,75 @@ class DocterController extends Controller
         if ($res) {
             $rawData = $request->input('data');
             $elements = explode(',', $rawData); 
-    
-            
-                $doctorweekday = Week_day::where('doctor_id', $doctor->id)->get();
-                foreach ($doctorweekday as $key => $dweekday) {
-                     $dweekday->delete();
-                }
-               
-               
-                 if (count($elements) % 2 !== 0) {
-                 return response()->json(['error' => 'Data is not in valid pairs'], 400);
-                }
-                
-                for ($i = 0; $i < count($elements); $i += 4) {
-              
-                    $weekDay1 = new Week_day();
-                    $weekDay1->day = $elements[$i];
-                    $weekDay1->date = $elements[$i + 1];
-                    $weekDay1->doctor_id = $doctor->id;
-                    $weekDay1->save();
-        
-                    
-                    if (isset($elements[$i + 2]) && isset($elements[$i + 3])) {
-                        $weekDay2 = new Week_day();
-                        $weekDay2->day = $elements[$i + 2];
-                        $weekDay2->date = $elements[$i + 3];
-                        $weekDay2->doctor_id = $doctor->id;
-                        $weekDay2->save();
+            $elementsPerRecord = 3; //  [id, day, date] or [day, date]
+
+            $doctorWeekdays = Week_day::where('doctor_id', $doctor->id)->get();
+            $existingIds = $doctorWeekdays->pluck('id')->toArray(); 
+
+            $index = 0;
+            while ($index < count($elements)) {
+                if (is_numeric($elements[$index])) {
+                    $id = $elements[$index];
+                    $day = $elements[$index + 1] ?? null;
+                    $date = $elements[$index + 2] ?? null;
+
+                    if (in_array($id, $existingIds)) {
+                        $weekDay = Week_day::find($id);
+                        if ($weekDay) {
+                            $weekDay->day = $day;
+                            $weekDay->date = $date;
+                            $weekDay->save();
+                        }
                     }
-             }
+
+                    $index += $elementsPerRecord; 
+                } else {
+                    $day = $elements[$index];
+                    $date = $elements[$index + 1] ?? null;
+
+                    $newWeekDay = new Week_day();
+                    $newWeekDay->day = $day;
+                    $newWeekDay->date = $date;
+                    $newWeekDay->doctor_id = $doctor->id;
+                    $newWeekDay->save();
+
+                    $index += 2; 
+                }
+            }
+
+    
+            // if (count($elements) % 3 !== 0) {
+            //     return response()->json(['error' => 'Data is not in valid groups of 3'], 400);
+            // }
+
+            // $elementsPerRecord = 3; // [id, day, date]
+            // $totalRecords = count($elements) / $elementsPerRecord;
+
+            // $doctorWeekdays = Week_day::where('doctor_id', $doctor->id)->get();
+            // $existingCount = $doctorWeekdays->count();
+
+            // foreach ($doctorWeekdays as $index => $weekDay) {
+            //     $elementIndex = $index * $elementsPerRecord;
+
+            //     if ($elementIndex + 2 < count($elements)) {
+            //         $weekDay->day = $elements[$elementIndex + 1];
+            //         $weekDay->date = $elements[$elementIndex + 2];
+            //         $weekDay->save();
+            //     }
+            // }
+
+            // if ($existingCount < $totalRecords) {
+            //     for ($i = $existingCount * $elementsPerRecord; $i < count($elements); $i += $elementsPerRecord) {
+            //         if ($i + 2 < count($elements)) {
+            //             $newWeekDay = new Week_day();
+            //             $newWeekDay->day = $elements[$i + 1];
+            //             $newWeekDay->date = $elements[$i + 2];
+            //             $newWeekDay->doctor_id = $doctor->id;
+            //             $newWeekDay->save();
+            //         }
+            //     }
+            // }
+
              $now = now();
              $year = $request->input('year', $now->year);
              $month = $request->input('month', $now->month);
