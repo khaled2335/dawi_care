@@ -24,13 +24,11 @@ class SalaryController extends Controller
     }
     $day->revenue += $services;
     $day->save();
-    $doctorId = Week_day::where('id', $day->day_id)->first();
-    $weekDays = Week_day::where('doctor_id', $doctorId->doctor_id)->get();
+    
     $countDays = 0;
-    foreach ($weekDays as $weekDay) {
-        $countDays += Attendance::where('day_id', $weekDay->id)->where('attedance',1)->count();
-    }
-    $salary = Salary::where('doctor_id', $doctorId->doctor_id)
+    $countDays += Attendance::where('doctor_id', $day->doctor_id)->where('attedance',1)->count();
+    
+    $salary = Salary::where('doctor_id', $day->doctor_id)
                     ->where('month', date('m'))
                     ->where('year', date('Y'))
                     ->first();
@@ -41,7 +39,7 @@ class SalaryController extends Controller
         $salary->save();
     } else {
         $salary = new Salary();
-        $salary->doctor_id = $doctorId->doctor_id;
+        $salary->doctor_id = $day->doctor_id;
         $salary->total_salary = $services;	
         $salary->num_worked_days = $countDays;
         $salary->month = date('m');
@@ -100,11 +98,20 @@ class SalaryController extends Controller
 // }
 
 public function add_salaryEmployee(Request $request, $employeeId){
-    $dayIds = Week_day::where('emplyee_id',$employeeId)->pluck('id');
     $employee = Employee::findOrFail($employeeId);
     $fixedsalary = $employee->fixed_salary;
-    $absenteeismCount = Attendance::whereIn('day_id', $dayIds)->where('attedance',0)->get()->count();
-    $attendanceCount = Attendance::whereIn('day_id', $dayIds)->where('attedance',1)->get()->count();
+    $currentMonth = Carbon::now()->month;
+    $currentYear = Carbon::now()->year;
+    $absenteeismCount = Attendance::whereIn('employee_id', $employeeId)
+    ->where('attedance',0)
+    ->whereMonth('created_at', $currentMonth)    
+    ->whereYear('created_at', $currentYear)
+    ->count();
+    $attendanceCount = Attendance::whereIn('day_id', $employeeId)
+    ->where('attedance',1)
+    ->whereMonth('created_at', $currentMonth)    
+    ->whereYear('created_at', $currentYear)
+    ->count();
     $deduction = $request->deduction; //per day
     $salary = Salary::where('employee_id', $employeeId)
     ->where('month', date('m'))

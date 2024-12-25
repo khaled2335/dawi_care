@@ -135,34 +135,24 @@ class AttendanceController extends Controller
     {
         Carbon::setLocale('ar');
         $today = Carbon::now()->locale('ar')->isoFormat('dddd');
-
         $query = Attendance::where('day_id', $id);
-
         if ($request->created_at) {
             $query->whereDate('created_at', $request->created_at);
         }
-
         $existingAttendance = $query->first();
 
         if ($existingAttendance) {
             if ($existingAttendance->attedance == 1) {
-                $existingAttendance->delete();
+                $existingAttendance->attedance = 0;
+                $existingAttendance->save();
+                return response()->json(['message' => 'take attendance'], 200);
             } else {
                 return response()->json(['message' => 'Attendance already taken'], 200);
             }
+
         }
-
-        $attendance = new Attendance;
-        $attendance->day_id = $id;
-        $attendance->attedance = 0;
-
-        if ($request->created_at) {
-            $attendance->created_at = $request->created_at;
-        }
-
-        $attendance->save();
-
-        return response()->json(['message' => 'take attendance'], 200);
+        
+        return response()->json(['message' => 'not found'], 200);
     }
 
     public function deleteattendence(Request $request, $id)
@@ -176,23 +166,21 @@ class AttendanceController extends Controller
         if (!$attendance) {
             return response()->json(['message' => 'No attendance record found for the given date and ID'], 404);
         }
-
-        $attendance->delete();
-
-        return response()->json(['message' => 'Attendance record deleted successfully'], 200);
+            $attendance->attedance == 1;
+            $attendance->save();
+            return response()->json(['message' => 'Attendance record deleted successfully'], 200);
     }
     public function takeattedence()
     {
         Carbon::setLocale('ar');
         date_default_timezone_set('Africa/Cairo'); 
         $today = now()->translatedFormat('l');
-        $weekdays = Week_day::whereDate('created_at', now()->toDateString())
-        ->orWhereDate('switch_day_date', now()->toDateString())
-        ->get();;
+        $weekdays = Week_day::where('day',  $today)
+        ->orWhere('switch_day', $today)
+        ->get();
         $attendanceTaken = false;
 
         foreach ($weekdays as $weekday) {
-            if ($today == $weekday->day) {
                 $existingAttendance = Attendance::where('day_id', $weekday->id)
                     ->whereDate('created_at', now()->toDateString())
                     ->first();
@@ -201,13 +189,15 @@ class AttendanceController extends Controller
                     $attendance = new Attendance;
                     $attendance->attedance = 1;
                     $attendance->day_id = $weekday->id;
+                    $attendance->doctor_id = $weekday->doctor_id;
+                    $attendance->employee_id = $weekday->emplyee_id;
                     $attendance->created_at = now();
                     $attendance->save();
                     $attendanceTaken = true;
                 } else {
                     $attendanceTaken = 'already_taken';
                 }
-            }
+            
         }
 
         if ($attendanceTaken === true) {
