@@ -99,20 +99,17 @@ class AttendanceController extends Controller
         return response()->json(['message' => 'not found'], 200);
     }
 
-    public function deleteattendence(Request $request, $id)
+    public function deleteattendence($id)
     {
-        $targetDate = Carbon::parse($request->date)->startOfDay();
-
-        $attendance = Attendance::whereDate('created_at', $targetDate)
-            ->where('day_id', $id)
-            ->first();
+        
+        $attendance = Attendance::find($id);
 
         if (!$attendance) {
             return response()->json(['message' => 'No attendance record found for the given date and ID'], 404);
         }
-            $attendance->attedance == 1;
+            $attendance->attedance = 1;
             $attendance->save();
-            return response()->json(['message' => 'Attendance record deleted successfully'], 200);
+            return response()->json(['message' => 'Attendance updating successfully'], 200);
     }
     public function takeattedence()
     {
