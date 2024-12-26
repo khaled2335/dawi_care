@@ -64,95 +64,106 @@ class AttendanceController extends Controller
 
     public function show($doctorId)
     {
-        $result = DB::table('week_days')
-            ->join('attendances', 'week_days.id', '=', 'attendances.day_id')
-            ->join('doctors', 'week_days.doctor_id', '=', 'doctors.id')
-            ->select(
-                'attendances.id',
-                'doctors.name',
-                'week_days.day',
-                'week_days.switch_day',
-                'attendances.attedance as attendance',
-                DB::raw('DATE(attendances.created_at) as attendance_date')
-            )
-            ->where('doctors.id', $doctorId)
-            ->get()
-            ->groupBy('name')
-            ->map(function ($group) {
-                return [
-                    'name' => $group[0]->name,
-                    'attendance_data' => $group->map(function ($item) {
-                        return [
-                            'attendanceId' => $item->id,
-                            'day' => $item->day,
-                            'switch_day' => $item->switch_day,
-                            'attendance' => $item->attendance,
-                            'date' => $item->attendance_date
-                        ];
-                    })->values()->toArray()
-                ];
-            })
-            ->values()
-            ->first();
+        // $result = DB::table('week_days')
+        //     ->join('attendances', 'week_days.id', '=', 'attendances.day_id')
+        //     ->join('doctors', 'week_days.doctor_id', '=', 'doctors.id')
+        //     ->select(
+        //         'attendances.id',
+        //         'doctors.name',
+        //         'week_days.day',
+        //         'week_days.switch_day',
+        //         'attendances.attedance as attendance',
+        //         DB::raw('DATE(attendances.created_at) as attendance_date')
+        //     )
+        //     ->where('doctors.id', $doctorId)
+        //     ->get()
+        //     ->groupBy('name')
+        //     ->map(function ($group) {
+        //         return [
+        //             'name' => $group[0]->name,
+        //             'attendance_data' => $group->map(function ($item) {
+        //                 return [
+        //                     'attendanceId' => $item->id,
+        //                     'day' => $item->day,
+        //                     'switch_day' => $item->switch_day,
+        //                     'attendance' => $item->attendance,
+        //                     'date' => $item->attendance_date
+        //                 ];
+        //             })->values()->toArray()
+        //         ];
+        //     })
+        //     ->values()
+        //     ->first();
+        $docattendence = Attendance::where('doctor_id',$doctorId)->get();
 
-        return response()->json($result);
+        return response()->json($docattendence);
     }
     public function showemployee($employeeId)
     {
-        $result = DB::table('week_days')
-            ->join('attendances', 'week_days.id', '=', 'attendances.day_id')
-            ->join('employees', 'week_days.emplyee_id', '=', 'employees.id')
-            ->select(
-                'employees.name',
-                'week_days.day',
-                'week_days.switch_day',
-                'attendances.attedance as attendance',
-                DB::raw('DATE(attendances.created_at) as attendance_date')
-            )
-            ->where('employees.id', $employeeId)
-            ->get()
-            ->groupBy('name')
-            ->map(function ($group) {
-                return [
-                    'name' => $group[0]->name,
-                    'attendance_data' => $group->map(function ($item) {
-                        return [
-                            'day' => $item->day,
-                            'switch_day' => $item->switch_day,
-                            'attendance' => $item->attendance,
-                            'date' => $item->attendance_date
-                        ];
-                    })->values()->toArray()
-                ];
-            })
-            ->values()
-            ->first();
-
-        return response()->json($result);
+        // $result = DB::table('week_days')
+        //     ->join('attendances', 'week_days.id', '=', 'attendances.day_id')
+        //     ->join('employees', 'week_days.emplyee_id', '=', 'employees.id')
+        //     ->select(
+        //         'employees.name',
+        //         'week_days.day',
+        //         'week_days.switch_day',
+        //         'attendances.attedance as attendance',
+        //         DB::raw('DATE(attendances.created_at) as attendance_date')
+        //     )
+        //     ->where('employees.id', $employeeId)
+        //     ->get()
+        //     ->groupBy('name')
+        //     ->map(function ($group) {
+        //         return [
+        //             'name' => $group[0]->name,
+        //             'attendance_data' => $group->map(function ($item) {
+        //                 return [
+        //                     'day' => $item->day,
+        //                     'switch_day' => $item->switch_day,
+        //                     'attendance' => $item->attendance,
+        //                     'date' => $item->attendance_date
+        //                 ];
+        //             })->values()->toArray()
+        //         ];
+        //     })
+        //     ->values()
+        //     ->first();
+        $employeettendence = Attendance::where('employee_id',$employeeId)->get();
+        return response()->json($employeettendence);
     }
 
     public function attendencezero($id, Request $request)
     {
         Carbon::setLocale('ar');
         $today = Carbon::now()->locale('ar')->isoFormat('dddd');
+
         $query = Attendance::where('day_id', $id);
+
         if ($request->created_at) {
             $query->whereDate('created_at', $request->created_at);
         }
+
         $existingAttendance = $query->first();
 
         if ($existingAttendance) {
             if ($existingAttendance->attedance == 1) {
-                $existingAttendance->attedance = 0;
-                $existingAttendance->save();
-                return response()->json(['message' => 'take attendance'], 200);
+                $existingAttendance->delete();
             } else {
                 return response()->json(['message' => 'Attendance already taken'], 200);
             }
-
         }
-        
-        return response()->json(['message' => 'not found'], 200);
+
+        $attendance = new Attendance;
+        $attendance->day_id = $id;
+        $attendance->attedance = 0;
+
+        if ($request->created_at) {
+            $attendance->created_at = $request->created_at;
+        }
+
+        $attendance->save();
+
+        return response()->json(['message' => 'take attendance'], 200);
     }
 
     public function deleteattendence(Request $request, $id)
@@ -166,21 +177,23 @@ class AttendanceController extends Controller
         if (!$attendance) {
             return response()->json(['message' => 'No attendance record found for the given date and ID'], 404);
         }
-            $attendance->attedance == 1;
-            $attendance->save();
-            return response()->json(['message' => 'Attendance record deleted successfully'], 200);
+
+        $attendance->delete();
+
+        return response()->json(['message' => 'Attendance record deleted successfully'], 200);
     }
     public function takeattedence()
     {
         Carbon::setLocale('ar');
         date_default_timezone_set('Africa/Cairo'); 
         $today = now()->translatedFormat('l');
-        $weekdays = Week_day::where('day',  $today)
-        ->orWhere('switch_day', $today)
-        ->get();
+        $weekdays = Week_day::whereDate('created_at', now()->toDateString())
+        ->orWhereDate('switch_day_date', now()->toDateString())
+        ->get();;
         $attendanceTaken = false;
 
         foreach ($weekdays as $weekday) {
+            if ($today == $weekday->day) {
                 $existingAttendance = Attendance::where('day_id', $weekday->id)
                     ->whereDate('created_at', now()->toDateString())
                     ->first();
@@ -189,15 +202,13 @@ class AttendanceController extends Controller
                     $attendance = new Attendance;
                     $attendance->attedance = 1;
                     $attendance->day_id = $weekday->id;
-                    $attendance->doctor_id = $weekday->doctor_id;
-                    $attendance->employee_id = $weekday->emplyee_id;
                     $attendance->created_at = now();
                     $attendance->save();
                     $attendanceTaken = true;
                 } else {
                     $attendanceTaken = 'already_taken';
                 }
-            
+            }
         }
 
         if ($attendanceTaken === true) {
@@ -205,7 +216,7 @@ class AttendanceController extends Controller
         } elseif ($attendanceTaken === 'already_taken') {
             return response()->json(['message' => 'Attendance already taken for today'], 400);
         } else {
-            return response()->json(['message' => 'No attendance taken'], 404);
+            return response()->json(['message' => 'No attendance taken'], 402);
         }
     }
 }
