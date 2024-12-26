@@ -75,27 +75,20 @@ class AttendanceController extends Controller
         return response()->json($employeettendence);
     }
 
-    public function attendencezero($id, Request $request)
+    public function attendencezero($id)
     {
-        Carbon::setLocale('ar');
-        $today = Carbon::now()->locale('ar')->isoFormat('dddd');
-        $query = Attendance::where('day_id', $id);
-        if ($request->created_at) {
-            $query->whereDate('created_at', $request->created_at);
-        }
-        $existingAttendance = $query->first();
-
-        if ($existingAttendance) {
-            if ($existingAttendance->attedance == 1) {
-                $existingAttendance->attedance = 0;
-                $existingAttendance->save();
+        
+        $attendance = Attendance::find($id);
+        
+        if ($attendance) {
+            if ($attendance->attedance == 1) {
+                $attendance->attedance = 0;
+                $attendance->save();
                 return response()->json(['message' => 'take attendance'], 200);
             } else {
                 return response()->json(['message' => 'Attendance already taken'], 200);
             }
-
         }
-        
         return response()->json(['message' => 'not found'], 200);
     }
 
