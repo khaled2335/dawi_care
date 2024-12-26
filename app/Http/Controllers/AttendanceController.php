@@ -94,7 +94,7 @@ class AttendanceController extends Controller
             })
             ->values()
             ->first();
-
+//
         return response()->json($result);
     }
     public function showemployee($employeeId)
