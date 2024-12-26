@@ -102,12 +102,14 @@ public function add_salaryEmployee(Request $request, $employeeId){
     $fixedsalary = $employee->fixed_salary;
     $currentMonth = Carbon::now()->month;
     $currentYear = Carbon::now()->year;
-    $absenteeismCount = Attendance::whereIn('employee_id', $employeeId)
+
+    $absenteeismCount = Attendance::where('employee_id', $employeeId)
     ->where('attedance',0)
     ->whereMonth('created_at', $currentMonth)    
     ->whereYear('created_at', $currentYear)
     ->count();
-    $attendanceCount = Attendance::whereIn('day_id', $employeeId)
+
+    $attendanceCount = Attendance::where('day_id', $employeeId)
     ->where('attedance',1)
     ->whereMonth('created_at', $currentMonth)    
     ->whereYear('created_at', $currentYear)
@@ -142,12 +144,13 @@ public function add_salaryEmployee(Request $request, $employeeId){
             $targetSalary->total_salary -= $customDeduction->deduction;
             $targetSalary->save();
         }
+        return response()->json(['salary' => $salary]);
     }
     
-    if ($deduction && $salary->is_payed == 0) {
+    if ($deduction) {
         $salary = new Salary();
         $salary->employee_id = $employeeId;
-        if($attendanceCount>0)
+        if($absenteeismCount>0)
             $salary->total_salary =  $fixedsalary - ($deduction * $absenteeismCount);
         else
             $salary->total_salary =  $fixedsalary;
