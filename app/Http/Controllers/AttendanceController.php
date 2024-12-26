@@ -64,71 +64,15 @@ class AttendanceController extends Controller
 
     public function show($doctorId)
     {
-        $result = DB::table('week_days')
-            ->join('attendances', 'week_days.id', '=', 'attendances.day_id')
-            ->join('doctors', 'week_days.doctor_id', '=', 'doctors.id')
-            ->select(
-                'attendances.id',
-                'doctors.name',
-                'week_days.day',
-                'week_days.switch_day',
-                'attendances.attedance as attendance',
-                DB::raw('DATE(attendances.created_at) as attendance_date')
-            )
-            ->where('doctors.id', $doctorId)
-            ->get()
-            ->groupBy('name')
-            ->map(function ($group) {
-                return [
-                    'name' => $group[0]->name,
-                    'attendance_data' => $group->map(function ($item) {
-                        return [
-                            'attendanceId' => $item->id,
-                            'day' => $item->day,
-                            'switch_day' => $item->switch_day,
-                            'attendance' => $item->attendance,
-                            'date' => $item->attendance_date
-                        ];
-                    })->values()->toArray()
-                ];
-            })
-            ->values()
-            ->first();
-//
-        return response()->json($result);
+        $docattendence = Attendance::where('doctor_id',$doctorId)->get();
+
+        return response()->json($docattendence);
     }
     public function showemployee($employeeId)
     {
-        $result = DB::table('week_days')
-            ->join('attendances', 'week_days.id', '=', 'attendances.day_id')
-            ->join('employees', 'week_days.emplyee_id', '=', 'employees.id')
-            ->select(
-                'employees.name',
-                'week_days.day',
-                'week_days.switch_day',
-                'attendances.attedance as attendance',
-                DB::raw('DATE(attendances.created_at) as attendance_date')
-            )
-            ->where('employees.id', $employeeId)
-            ->get()
-            ->groupBy('name')
-            ->map(function ($group) {
-                return [
-                    'name' => $group[0]->name,
-                    'attendance_data' => $group->map(function ($item) {
-                        return [
-                            'day' => $item->day,
-                            'switch_day' => $item->switch_day,
-                            'attendance' => $item->attendance,
-                            'date' => $item->attendance_date
-                        ];
-                    })->values()->toArray()
-                ];
-            })
-            ->values()
-            ->first();
-
-        return response()->json($result);
+        
+        $employeettendence = Attendance::where('employee_id',$employeeId)->get();
+        return response()->json($employeettendence);
     }
 
     public function attendencezero($id, Request $request)
