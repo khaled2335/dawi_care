@@ -109,7 +109,7 @@ public function add_salaryEmployee(Request $request, $employeeId){
     ->whereYear('created_at', $currentYear)
     ->count();
 
-    $attendanceCount = Attendance::where('day_id', $employeeId)
+    $attendanceCount = Attendance::where('employee_id', $employeeId)
     ->where('attedance',1)
     ->whereMonth('created_at', $currentMonth)    
     ->whereYear('created_at', $currentYear)
@@ -121,7 +121,7 @@ public function add_salaryEmployee(Request $request, $employeeId){
     ->first();
 
     //customDeduction
-    if($request->customdeduction && $salary){
+    if($request->customdeduction){
         // Get the month and year from created_at if provided, otherwise use current date
         $deductionDate = $request->created_at ? Carbon::parse($request->created_at) : Carbon::now();
         
@@ -131,33 +131,55 @@ public function add_salaryEmployee(Request $request, $employeeId){
             ->where('year', $deductionDate->format('Y'))
             ->first();
         
+        $customDeduction  = new deduction();
+        $customDeduction->deduction = $request->customdeduction;
+        $customDeduction->description = $request->description;
+        $customDeduction->salary_id = 1;
+        if ($request->created_at) {
+            $customDeduction->created_at = $request->created_at;
+        }
+        $customDeduction->save();
         if($targetSalary) {
-            $customDeduction  = new deduction();
-            $customDeduction->deduction = $request->customdeduction;
-            $customDeduction->description = $request->description;
-            $customDeduction->salary_id = $targetSalary->id;
-            if ($request->created_at) {
-                $customDeduction->created_at = $request->created_at;
-            }
-            $customDeduction->save();
-            
-            $targetSalary->total_salary -= $customDeduction->deduction;
+            $targetSalary->custom_deduction += $customDeduction->deduction;
             $targetSalary->save();
+            $customDeduction->salary_id = $targetSalary->id;
+            $customDeduction->save();
+        }
+        else{
+            $salary = new Salary();
+            $salary->employee_id = $employeeId;
+            $salary->total_salary =  $fixedsalary;
+            $salary->num_worked_days = $attendanceCount;
+            $salary->custom_deduction += $request->customdeduction;
+            $salary->is_payed = 0;
+            $salary->month = date('m');
+            $salary->year = date('Y');
+            $salary->save();
+            $customDeduction->salary_id = $salary->id;
+            $customDeduction->save();
         }
         return response()->json(['salary' => $salary]);
     }
     
-    if ($deduction) {
+    if ($deduction && !$salary) {
         $salary = new Salary();
         $salary->employee_id = $employeeId;
         if($absenteeismCount>0)
-            $salary->total_salary =  $fixedsalary - ($deduction * $absenteeismCount);
+            $salary->total_salary =  $fixedsalary - ($deduction * $absenteeismCount) - $salary->custom_deduction;
         else
-            $salary->total_salary =  $fixedsalary;
+        $salary->total_salary =  $fixedsalary - $salary->custom_deduction;
         $salary->num_worked_days = $attendanceCount;
         $salary->is_payed = $request->is_payed ?? 1;
         $salary->month = date('m');
         $salary->year = date('Y');
+        $salary->save();
+    }
+    elseif ($deduction && $salary) {
+        if($absenteeismCount>0)
+            $salary->total_salary =  $fixedsalary - ($deduction * $absenteeismCount) - $salary->custom_deduction;
+        else
+        $salary->total_salary =  $fixedsalary - $salary->custom_deduction;
+        $salary->is_payed = $request->is_payed ?? 1;
         $salary->save();
     }
     elseif ($salary->is_payed == 1) {
